@@ -83,3 +83,82 @@ Replicates: MRC5_r1 MRC5_r2 MRC5_r3 MRC5_r4
 >> python3 /projectnb/vcres/myousry/MPRA/scripts/read_stats.py OL49_trial.stats /projectnb/vcres/myousry/MPRA/config/acc_id.txt OL49_trial /projectnb/vcres/myousry/MPRA/results/02_count
 >> python3 /projectnb/vcres/myousry/MPRA/scripts/count_qc.py /projectnb/vcres/myousry/MPRA/config/acc_id.txt OL49_trial.count OL49_trial /projectnb/vcres/myousry/MPRA/results/02_count
 Wrote condition file to /projectnb/vcres/myousry/MPRA/results/02_count/OL49_trial_condition.txt
+Barcode	Oligo	Aln_Start:Stop	Plasmid_r1	Plasmid_r2	Plasmid_r3	Plasmid_r4	A549_r1	A549_r2	A549_r3	GM12878_r1	GM12878_r2	GM12878_r3	GM12878_r4	HEK293_r1	HEK293_r2	HEK293_r3	HEK293_r4	Jurkat_r1	Jurkat_r2	Jurkat_r3	Jurkat_r4	Jurkat_r5	K562_r1	K562_r2	K562_r3	K562_r4	MRC5_r1	MRC5_r2	MRC5_r3	MRC5_r4
+
+Celltype: A549
+Replicates: A549_r1 A549_r2 A549_r3
+
+Celltype: GM12878
+Replicates: GM12878_r1 GM12878_r2 GM12878_r3 GM12878_r4
+
+Celltype: HEK293
+Replicates: HEK293_r1 HEK293_r2 HEK293_r3 HEK293_r4
+
+Celltype: Jurkat
+Replicates: Jurkat_r1 Jurkat_r2 Jurkat_r3 Jurkat_r4 Jurkat_r5
+
+Celltype: K562
+Replicates: K562_r1 K562_r2 K562_r3 K562_r4
+
+Celltype: MRC5
+Replicates: MRC5_r1 MRC5_r2 MRC5_r3 MRC5_r4
+>> python3 /projectnb/vcres/myousry/MPRA/scripts/bc_raw.py OL49_trial_condition.txt OL49_trial.count OL49_trial /projectnb/vcres/myousry/MPRA/results/02_count
+Skipping move for Plasmid_r1.match, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for Plasmid_r2.match, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for Plasmid_r3.match, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for Plasmid_r4.match, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for A549_r1.match, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for A549_r2.match, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for A549_r3.match, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for GM12878_r1.match, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for GM12878_r2.match, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for GM12878_r3.match, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for GM12878_r4.match, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for HEK293_r1.match, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for HEK293_r2.match, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for HEK293_r3.match, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for HEK293_r4.match, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for Jurkat_r1.match, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for Jurkat_r2.match, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for Jurkat_r3.match, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for Jurkat_r4.match, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for Jurkat_r5.match, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for K562_r1.match, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for K562_r2.match, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for K562_r3.match, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for K562_r4.match, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for MRC5_r1.match, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for MRC5_r2.match, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for MRC5_r3.match, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for MRC5_r4.match, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for Plasmid_r1.tag, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for Plasmid_r2.tag, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for Plasmid_r3.tag, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for Plasmid_r4.tag, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for A549_r1.tag, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for A549_r2.tag, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for A549_r3.tag, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for GM12878_r1.tag, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for GM12878_r2.tag, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for GM12878_r3.tag, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for GM12878_r4.tag, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for HEK293_r1.tag, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for HEK293_r2.tag, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for HEK293_r3.tag, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for HEK293_r4.tag, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for Jurkat_r1.tag, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for Jurkat_r2.tag, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for Jurkat_r3.tag, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for Jurkat_r4.tag, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for Jurkat_r5.tag, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for K562_r1.tag, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for K562_r2.tag, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for K562_r3.tag, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for K562_r4.tag, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for MRC5_r1.tag, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for MRC5_r2.tag, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for MRC5_r3.tag, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for MRC5_r4.tag, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for OL49_trial.count, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for OL49_trial.stats, already in /projectnb/vcres/myousry/MPRA/results/02_count/
+Skipping move for OL49_trial_condition.txt, already in /projectnb/vcres/myousry/MPRA/results/02_count/
