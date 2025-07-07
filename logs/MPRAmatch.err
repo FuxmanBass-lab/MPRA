@@ -1,0 +1,14 @@
+>> flash2 -r 250 -f 274 -s 25 -o OL49_trial.merged -t 30 /projectnb/vcres/myousry/MPRA/data/library/OL49_r1.fastq.gz /projectnb/vcres/myousry/MPRA/data/library/OL49_r2.fastq.gz
+>> python3 /projectnb/vcres/myousry/MPRA/scripts/pull_barcodes.py OL49_trial.merged.extendedFrags.fastq 2 OL49_trial.merged TCTAGA AGTG CGTC 100 50 210 20 38 16
+>> awk '{print ">"$1"#"$3"\n"$4}' OL49_trial.merged.match > OL49_trial.merged.match.enh.fa
+>> gzip OL49_trial.merged.match.enh.fa
+>> minimap2 --for-only -Y --secondary=no -m 10 -n 1 -t 30 --end-bonus 12 -O 5 -E 1 -k 10 -2K50m --eqx --cs=short -c -a /projectnb/vcres/myousry/MPRA/data/library/OL49_reference.fasta.gz OL49_trial.merged.match.enh.fa.gz > OL49_trial.merged.match.enh.sam 2> OL49_trial.merged.match.enh.log
+>> samtools view -S -b OL49_trial.merged.match.enh.sam > OL49_trial.merged.match.enh.bam
+>> python3 /projectnb/vcres/myousry/MPRA/scripts/sam2mpra_cs.py -C OL49_trial.merged.match.enh.sam OL49_trial.merged.match.enh.mapped
+>> sort -S30G -k2 OL49_trial.merged.match.enh.mapped > OL49_trial.merged.match.enh.mapped.barcode.sort
+>> python3 /projectnb/vcres/myousry/MPRA/scripts/ct_seq.py OL49_trial.merged.match.enh.mapped.barcode.sort 2 4 > OL49_trial.merged.match.enh.mapped.barcode.ct
+>> python3 /projectnb/vcres/myousry/MPRA/scripts/parse_map.py OL49_trial.merged.match.enh.mapped.barcode.ct > OL49_trial.merged.match.enh.mapped.barcode.ct.parsed
+>> awk '($5==0)' OL49_trial.merged.match.enh.mapped.barcode.ct | awk '{ct[$2]++;cov[$2]+=$4} END {for(i in ct) print i"\t"ct[i]"\t"cov[i]}' > OL49_trial.merged.match.enh.mapped.barcode.ct.plothist
+>> awk '{ct[$4]++} END {for(i in ct) print i"\t"ct[i]}' OL49_trial.merged.match.enh.mapped.barcode.ct | sort -k1n > OL49_trial.merged.match.enh.mapped.barcode.ct.hist
+>> preseq lc_extrap -H OL49_trial.merged.match.enh.mapped.barcode.ct.hist -o OL49_trial.merged.match.enh.mapped.barcode.ct.hist.preseq -s 25000000 -n 1000 -e 1000000000
+>> python3 /projectnb/vcres/myousry/MPRA/scripts/mapping_qc_plots.py OL49_trial.merged.match.enh.mapped.barcode.ct.parsed OL49_trial.merged.match.enh.mapped.barcode.ct.plothist OL49_trial.merged.match.enh.mapped.barcode.ct.hist.preseq OL49_trial.merged.match.enh.mapped.barcode.ct.hist /projectnb/vcres/myousry/MPRA/data/library/OL49_reference.fasta.gz OL49_trial

@@ -1,0 +1,34 @@
+# config/config.yaml
+
+# ─── Project identity ────────────────────────────────────────────────
+project:
+  name: OL49
+  suffix: trial
+
+# ─── Directory layout ────────────────────────────────────────────────
+paths:
+  base: /projectnb/vcres/myousry/MPRA
+  scripts: /projectnb/vcres/myousry/MPRA/scripts
+  raw: "${paths.base}/data/raw"
+  reference: "${paths.base}/data/reference"
+  interim: "${paths.base}/data/interim"
+  results:
+    match: "${paths.base}/results/01_match"
+    count: "${paths.base}/results/02_count"
+
+# ─── MPRAmatch inputs ────────────────────────────────────────────────
+match:
+  read1: "${paths.raw}/${project.name}_r1.fastq.gz"
+  read2: "${paths.raw}/${project.name}_r2.fastq.gz"
+  reference: "${paths.reference}/${project.name}_reference.fasta.gz"
+  id_out: "${project.name}_${project.suffix}"
+  out_dir: "${paths.results.match}"
+
+# ─── MPRAcount inputs ────────────────────────────────────────────────
+count:
+  acc_id: "${paths.base}/config/acc_id.txt"
+  parsed: "${paths.results.match}/${match.id_out}.merged.match.enh.mapped.barcode.ct.parsed"
+  id_out: "${match.id_out}"
+  out_dir: "${paths.results.count}"
+
+# ─── MPRAmodel inputs ────────────────────────────────────────────────
