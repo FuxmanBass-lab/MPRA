@@ -494,7 +494,7 @@ dataOut <- function(countsData, attributesData, conditionData, exclList = c(), a
     full_bed_outputA<-merge(attributesData, as.matrix(dups_output),by.x="ID",by.y="row.names",all.x=TRUE,no.dups=FALSE)
     # message(paste0(colnames(full_bed_outputA), collapse = "\t"))
     #printbed<-full_bed_outputA[,c("chr","start","stop","ID","strand","log2FoldChange","Ctrl.Mean","Exp.Mean","pvalue","padj","lfcSE","cigar","md-tag","project")]
-    if(!(c("start","stop") %in% colnames(full_bed_outputA))){
+    if(!all(c("start","stop") %in% colnames(full_bed_outputA))){
       full_bed_outputA$start <- ""
       full_bed_outputA$stop <- ""
     }

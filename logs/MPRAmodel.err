@@ -82,3 +82,190 @@ gene-wise dispersion estimates
 mean-dispersion relationship
 final dispersion estimates
 fitting model and testing
+A549
+summit shift
+GM12878
+summit shift
+HEK293
+summit shift
+Jurkat
+summit shift
+K562
+summit shift
+MRC5
+summit shift
+Tags Normalized
+condition data standardized
+gene-wise dispersion estimates
+mean-dispersion relationship
+final dispersion estimates
+gene-wise dispersion estimates
+mean-dispersion relationship
+final dispersion estimates
+gene-wise dispersion estimates
+mean-dispersion relationship
+final dispersion estimates
+gene-wise dispersion estimates
+mean-dispersion relationship
+final dispersion estimates
+gene-wise dispersion estimates
+mean-dispersion relationship
+final dispersion estimates
+gene-wise dispersion estimates
+mean-dispersion relationship
+final dispersion estimates
+updating dispersions for:
+A549
+found results columns, replacing these
+updating dispersions for:
+GM12878
+found results columns, replacing these
+updating dispersions for:
+HEK293
+found results columns, replacing these
+updating dispersions for:
+Jurkat
+found results columns, replacing these
+updating dispersions for:
+K562
+found results columns, replacing these
+updating dispersions for:
+MRC5
+found results columns, replacing these
+68954	28
+A549
+Removing count duplicates
+identifying duplicates
+resolving duplicates
+Plotting Normalization Curves
+Skipping density plot for A549 due to insufficient data points.
+Results of dds_results recieved
+Control and Experiment Columns Set
+identifying duplicates
+resolving duplicates
+Removing Duplicates
+identifying duplicates
+resolving duplicates
+Writing Standard Results File
+Writing bed File
+GM12878
+Removing count duplicates
+identifying duplicates
+resolving duplicates
+Plotting Normalization Curves
+Skipping density plot for GM12878 due to insufficient data points.
+Results of dds_results recieved
+Control and Experiment Columns Set
+identifying duplicates
+resolving duplicates
+Removing Duplicates
+identifying duplicates
+resolving duplicates
+Writing Standard Results File
+Writing bed File
+HEK293
+Removing count duplicates
+identifying duplicates
+resolving duplicates
+Plotting Normalization Curves
+Skipping density plot for HEK293 due to insufficient data points.
+Results of dds_results recieved
+Control and Experiment Columns Set
+identifying duplicates
+resolving duplicates
+Removing Duplicates
+identifying duplicates
+resolving duplicates
+Writing Standard Results File
+Writing bed File
+Jurkat
+Removing count duplicates
+identifying duplicates
+resolving duplicates
+Plotting Normalization Curves
+Skipping density plot for Jurkat due to insufficient data points.
+Results of dds_results recieved
+Control and Experiment Columns Set
+identifying duplicates
+resolving duplicates
+Removing Duplicates
+identifying duplicates
+resolving duplicates
+Writing Standard Results File
+Writing bed File
+K562
+Removing count duplicates
+identifying duplicates
+resolving duplicates
+Plotting Normalization Curves
+Skipping density plot for K562 due to insufficient data points.
+Results of dds_results recieved
+Control and Experiment Columns Set
+identifying duplicates
+resolving duplicates
+Removing Duplicates
+identifying duplicates
+resolving duplicates
+Writing Standard Results File
+Writing bed File
+MRC5
+Removing count duplicates
+identifying duplicates
+resolving duplicates
+Plotting Normalization Curves
+Skipping density plot for MRC5 due to insufficient data points.
+Results of dds_results recieved
+Control and Experiment Columns Set
+identifying duplicates
+resolving duplicates
+Removing Duplicates
+identifying duplicates
+resolving duplicates
+Writing Standard Results File
+Writing bed File
+Plotting correlation tables
+Plotting Correlation Scatter Plots
+Plotting log Fold Change plots
+A549
+71259	20
+0	237.517859406489	425.856606072334	495.437785926242	687.11947222641	2846.37899564921	4440
+data.frame
+65028	20
+65028	20
+65028	20
+GM12878
+71259	20
+0	237.517859406489	425.856606072334	495.437785926242	687.11947222641	2846.37899564921	4440
+data.frame
+65028	20
+65028	20
+65028	20
+HEK293
+71259	20
+0	237.517859406489	425.856606072334	495.437785926242	687.11947222641	2846.37899564921	4440
+data.frame
+65028	20
+65028	20
+65028	20
+Jurkat
+71259	20
+0	237.517859406489	425.856606072334	495.437785926242	687.11947222641	2846.37899564921	4440
+data.frame
+65028	20
+65028	20
+65028	20
+K562
+71259	20
+0	237.517859406489	425.856606072334	495.437785926242	687.11947222641	2846.37899564921	4440
+data.frame
+65028	20
+65028	20
+65028	20
+MRC5
+71259	20
+0	237.517859406489	425.856606072334	495.437785926242	687.11947222641	2846.37899564921	4440
+data.frame
+65028	20
+65028	20
+65028	20
+There were 50 or more warnings (use warnings() to see the first 50)
