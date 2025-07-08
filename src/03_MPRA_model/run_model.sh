@@ -25,7 +25,7 @@ POS_CTRL="expCtrl"
 # -----------------------------------------------------------------------------
 
 # Sanity check for required files and scripts
-for f in "$REF_FASTA" "$SCRIPTS/make_project_list.py" "$SCRIPTS/make_attributes.py"; do
+for f in "$REF_FASTA" "$SCRIPTS/make_project_list.py" "$SCRIPTS/make_attributes_oligo.py"; do
   if [ ! -e "$f" ]; then
     echo "ERROR: cannot find required input: $f" >&2
     exit 1
@@ -46,9 +46,9 @@ echo "Creating attributes file..."
 python3 "$SCRIPTS/make_attributes_oligo.py" "${ID_OUT}.proj_list" "$ID_OUT" 2> make_attributes_warnings.txt
 
 # Create custom R script
-echo "Generating custom.R..."
+echo "Generating custom.r..."
 
-cat << EOF > "$MODEL_OUT/custom.R"
+cat << EOF > "$MODEL_OUT/custom.r"
 proj <- "$PROJ"
 prefix <- "$PREFIX"
 negCtrl <- "$NEG_CTRL"
@@ -57,14 +57,10 @@ attr_proj <- read.delim("${MODEL_IN}/${ID_OUT}.attributes", stringsAsFactors=FAL
 count_proj <- read.delim("${COUNT_DIR}/${ID_OUT}.count", stringsAsFactors=FALSE)
 cond_proj <- read.delim("${COUNT_DIR}/${ID_OUT}_condition.txt", stringsAsFactors=FALSE, row.names=1, header=FALSE)
 colnames(cond_proj) <- "condition"
-source("${SRC}/03_MPRAmodel/model.r")
+source("${SRC}/03_MPRA_model/model.r")
 proj_out <- MPRAmodel(count_proj, attr_proj, cond_proj, filePrefix=paste0(proj,prefix, sep=""), negCtrlName=negCtrl, posCtrlName=posCtrl, projectName=proj, cSkew=FALSE, prior=FALSE, method='ss')
 writeLines(capture.output(sessionInfo()), "sessionInfo.txt")
 EOF
 
-echo "Preparation complete. To run R model:"
-echo "  cd $MODEL_OUT"
-echo "  module load R/4.4.0"
-echo "  Rscript custom.R"
-
-echo "All done!"
+Rscript "$MODEL_OUT/custom.r"
+echo "R model run complete!"

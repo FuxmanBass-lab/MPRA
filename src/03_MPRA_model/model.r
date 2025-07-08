@@ -507,7 +507,7 @@ dataOut <- function(countsData, attributesData, conditionData, exclList = c(), a
   ## separated by semi-colons have been separated into separate rows.
 expandDups <- function(output){
   output_orig <- output
-  if(class(output_orig)=="matrix"){
+  if(inherits(output_orig, "matrix")){
     output_orig <- as.data.frame(output_orig)
   }
   output_new <- cbind(rownames(output_orig), output_orig)
