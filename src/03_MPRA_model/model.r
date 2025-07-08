@@ -294,8 +294,9 @@ tagSig <- function(dds_results, dds_rna, cond_data, exclList=c(), prior=F){
 # upDisp          : LOGICAL default T, update dispersions with celltype specific calculations
 # prior           : LOGICAL default T, use betaPrior=T when calculating the celltype specific dispersions.
 ## OUTPUT: writes duplicate output and ttest files for each celltype
-dataOut <- function(countsData, attributesData, conditionData, exclList = c(), altRef = T, file_prefix, method = 'ss',negCtrlName="negCtrl",
-                    tTest=T, DEase=T, cSkew=T, correction="BH", cutoff=0.01, upDisp=T, prior=F, paired=F){
+dataOut <- function(countsData, attributesData, conditionData, exclList = c(), altRef = T, file_prefix, method = 'ss', 
+                    negCtrlName = "negCtrl", tTest = T, DEase = T, cSkew = T, correction = "BH", cutoff = 0.01, 
+                    upDisp = T, prior = F, paired = F, runAllelic = TRUE) {
   counts_data <- countsData[,c("Barcode","Oligo",rownames(conditionData))]
   message(paste0(colnames(counts_data), collapse = "\t"))
   count_data <- oligoIsolate(counts_data, file_prefix)
@@ -361,17 +362,29 @@ dataOut <- function(countsData, attributesData, conditionData, exclList = c(), a
     temp_outputB <- results(dds_results_orig, contrast=c("condition",celltype,"DNA"), cooksCutoff=F, independentFiltering=F)
     
     message("Plotting Normalization Curves")
-    pdf(paste0("plots/",file_prefix,"_",fileDate(),"_Normalized_FC_Density_",celltype,".pdf"),width=10,height=10)
-    plot(density(temp_outputB[attribute_ids,"log2FoldChange"],na.rm=TRUE),xlim=c(-3,3),ylim=c(0,1.5),col="grey",main=paste0("Normalization - ",celltype))
-    lines(density(temp_outputB$log2FoldChange,na.rm=TRUE),xlim=c(-3,3),col="black")
-    lines(density(outputA$log2FoldChange,na.rm=TRUE),xlim=c(-3,3),col="red")
-    lines(density(outputA[attribute_ids,"log2FoldChange"],na.rm=TRUE),xlim=c(-3,3),col="salmon")
-    text(1.5,0.4,adj=c(0,0),labels="All - baseline",col="black")
-    text(1.5,0.35,adj=c(0,0),labels="All - corrected",col="red")
-    text(1.5,0.3,adj=c(0,0),labels=paste0(negCtrlName," - baseline"),col="grey")
-    text(1.5,0.25,adj=c(0,0),labels=paste0(negCtrlName," - corrected"),col="salmon")
-    abline(v=0)
-    dev.off()
+    
+    vals_baseline_neg <- temp_outputB[attribute_ids,"log2FoldChange"]
+    vals_baseline_all <- temp_outputB$log2FoldChange
+    vals_corrected_all <- outputA$log2FoldChange
+    vals_corrected_neg <- outputA[attribute_ids,"log2FoldChange"]
+
+    # Only plot if there are at least 2 finite points in each group
+    if(sum(is.finite(vals_baseline_neg)) >= 2 & sum(is.finite(vals_baseline_all)) >= 2 &
+       sum(is.finite(vals_corrected_all)) >= 2 & sum(is.finite(vals_corrected_neg)) >= 2){
+      pdf(paste0("plots/",file_prefix,"_",fileDate(),"_Normalized_FC_Density_",celltype,".pdf"),width=10,height=10)
+      plot(density(vals_baseline_neg,na.rm=TRUE),xlim=c(-3,3),ylim=c(0,1.5),col="grey",main=paste0("Normalization - ",celltype))
+      lines(density(vals_baseline_all,na.rm=TRUE),xlim=c(-3,3),col="black")
+      lines(density(vals_corrected_all,na.rm=TRUE),xlim=c(-3,3),col="red")
+      lines(density(vals_corrected_neg,na.rm=TRUE),xlim=c(-3,3),col="salmon")
+      text(1.5,0.4,adj=c(0,0),labels="All - baseline",col="black")
+      text(1.5,0.35,adj=c(0,0),labels="All - corrected",col="red")
+      text(1.5,0.3,adj=c(0,0),labels=paste0(negCtrlName," - baseline"),col="grey")
+      text(1.5,0.25,adj=c(0,0),labels=paste0(negCtrlName," - corrected"),col="salmon")
+      abline(v=0)
+      dev.off()
+    } else {
+      message("Skipping density plot for ", celltype, " due to insufficient data points.")
+    }
     
     message("Results of dds_results recieved")
 
@@ -396,81 +409,85 @@ dataOut <- function(countsData, attributesData, conditionData, exclList = c(), a
     full_output[[celltype]]<-full_outputA
     write.table(full_outputA, paste0("results/", file_prefix, "_", celltype, "_", fileDate(), ".out"), row.names=F, col.names=T, sep="\t", quote=F)
 
-    if(tTest==T){
-      message("Writing T-Test Results File")
-      outA<-cellSpecificTtest(attributesData, counts_norm_sp, dups_output, ctrl_mean, exp_mean, ctrl_cols, exp_cols, altRef, correction, cutoff, prior)
-      full_output_var[[celltype]]<-outA
-      write.table(outA,paste0("results/", file_prefix, "_", celltype, "_emVAR_ttest_", fileDate(),".out"), row.names=F, col.names=T, sep="\t", quote=F)
-      # write.table(attributesData, "results/ttest_attributes.txt", row.names = F, quote = F, sep = "\t")
-      # write.table(counts_norm_sp, paste0("results/ttest_",celltype,"_norm_counts.txt"), quote = F, sep = "\t")
-      # write.table(dups_output, "results/ttest_dups_out.txt", quote = F, sep = "\t")
-    }
+    if(runAllelic){
 
-    if(DEase==T){
-      message("Writing DESeq Allelic Skew Results File")
-      if(paired==F){
-        cond_pass <- condition_table
+      if(tTest==T){
+        message("Writing T-Test Results File")
+        outA<-cellSpecificTtest(attributesData, counts_norm_sp, dups_output, ctrl_mean, exp_mean, ctrl_cols, exp_cols, altRef, correction, cutoff, prior)
+        full_output_var[[celltype]]<-outA
+        write.table(outA,paste0("results/", file_prefix, "_", celltype, "_emVAR_ttest_", fileDate(),".out"), row.names=F, col.names=T, sep="\t", quote=F)
+        # write.table(attributesData, "results/ttest_attributes.txt", row.names = F, quote = F, sep = "\t")
+        # write.table(counts_norm_sp, paste0("results/ttest_",celltype,"_norm_counts.txt"), quote = F, sep = "\t")
+        # write.table(dups_output, "results/ttest_dups_out.txt", quote = F, sep = "\t")
       }
-      if(paired==T){
-        plas_row <- length(conditionData$condition[which(conditionData=="DNA")])
-        message(plas_row)
-        cell_row <- length(conditionData$condition[which(conditionData$condition==celltype)])
-        message(cell_row)
-        if(plas_row==cell_row){
+
+      if(DEase==T){
+        message("Writing DESeq Allelic Skew Results File")
+        if(paired==F){
           cond_pass <- condition_table
         }
-        else if(plas_row!=cell_row){
-          if(plas_row > cell_row){
-            drop_num <- plas_row - cell_row
-            message(paste0("dropping ", drop_num," DNA replicates for paired GLM analysis"))
-            plas_ids <- data.frame(matrix(ncol = 2, nrow=plas_row))
-            colnames(plas_ids) <- c("rep","bc_count")
-            plas_ids$rep <- rownames(conditionData)[which(conditionData$condition=="DNA")]
-            
-            for(id in plas_ids$rep){
-              # message(id)
-              # message(sum(counts_data[,id] > 0))
+        if(paired==T){
+          plas_row <- length(conditionData$condition[which(conditionData=="DNA")])
+          message(plas_row)
+          cell_row <- length(conditionData$condition[which(conditionData$condition==celltype)])
+          message(cell_row)
+          if(plas_row==cell_row){
+            cond_pass <- condition_table
+          }
+          else if(plas_row!=cell_row){
+            if(plas_row > cell_row){
+              drop_num <- plas_row - cell_row
+              message(paste0("dropping ", drop_num," DNA replicates for paired GLM analysis"))
+              plas_ids <- data.frame(matrix(ncol = 2, nrow=plas_row))
+              colnames(plas_ids) <- c("rep","bc_count")
+              plas_ids$rep <- rownames(conditionData)[which(conditionData$condition=="DNA")]
               
-              plas_ids[plas_ids$rep==id,"bc_count"] <- sum(counts_data[,id] > 0)
+              for(id in plas_ids$rep){
+                # message(id)
+                # message(sum(counts_data[,id] > 0))
+                
+                plas_ids[plas_ids$rep==id,"bc_count"] <- sum(counts_data[,id] > 0)
+              }
+              plas_ids <- plas_ids[order(plas_ids$bc_count),]
+              
+              plas_drop <- plas_ids$rep[1:drop_num]
+              
+              message(paste0("Dropping: ",plas_drop, collapse = "\t"))
+              cond_pass <- condition_table[which(!rownames(condition_table)%in%plas_drop),]
             }
-            plas_ids <- plas_ids[order(plas_ids$bc_count),]
+            else if(cell_row > plas_row){
+              drop_num <- cell_row - plas_row
+              message(paste0("dropping ", drop_num," ",celltype, " replicates for paired GLM analysis"))
+              cell_ids <- data.frame(matrix(ncol = 2, nrow=cell_row))
+              colnames(cell_ids) <- c("rep","bc_count")
+              cell_ids$rep <- rownames(conditionData)[which(conditionData$condition==celltype)]
+              message(paste0(cell_ids$rep, collapse = "\t"))
             
-            plas_drop <- plas_ids$rep[1:drop_num]
-            
-            message(paste0("Dropping: ",plas_drop, collapse = "\t"))
-            cond_pass <- condition_table[which(!rownames(condition_table)%in%plas_drop),]
-          }
-          else if(cell_row > plas_row){
-            drop_num <- cell_row - plas_row
-            message(paste0("dropping ", drop_num," ",celltype, " replicates for paired GLM analysis"))
-            cell_ids <- data.frame(matrix(ncol = 2, nrow=cell_row))
-            colnames(cell_ids) <- c("rep","bc_count")
-            cell_ids$rep <- rownames(conditionData)[which(conditionData$condition==celltype)]
-            message(paste0(cell_ids$rep, collapse = "\t"))
-          
-            message(class(cell_ids))
-            
-            for(id in cell_ids$rep){
-             
-              cell_ids[cell_ids$rep==id,"bc_count"] <- sum(counts_data[,id] > 0)
+              message(class(cell_ids))
+              
+              for(id in cell_ids$rep){
+              
+                cell_ids[cell_ids$rep==id,"bc_count"] <- sum(counts_data[,id] > 0)
+              }
+              cell_ids <- cell_ids[order(cell_ids$bc_count),]
+              
+              cell_drop <- cell_ids$rep[1:drop_num]
+              
+              message(paste0("Dropping: ",cell_drop, collapse = "\t"))
+              cond_pass <- condition_table[which(!rownames(condition_table)%in%cell_drop),]
             }
-            cell_ids <- cell_ids[order(cell_ids$bc_count),]
-            
-            cell_drop <- cell_ids$rep[1:drop_num]
-            
-            message(paste0("Dropping: ",cell_drop, collapse = "\t"))
-            cond_pass <- condition_table[which(!rownames(condition_table)%in%cell_drop),]
           }
+          counts_norm_DE <- counts_norm_DE[,which(colnames(counts_norm_DE) %in% rownames(cond_pass))]
         }
-        counts_norm_DE <- counts_norm_DE[,which(colnames(counts_norm_DE) %in% rownames(cond_pass))]
+        outB <- DESkew(cond_pass, counts_norm_DE, attributesData, celltype, dups_output,prior, cutoff, paired)
+        if(paired==F){
+          write.table(outB,paste0("results/", file_prefix, "_", celltype, "_emVAR_glm_", fileDate(),".out"), row.names=F, col.names=T, sep="\t", quote=F)
+        }
+        if(paired==T){
+          write.table(outB,paste0("results/", file_prefix, "_", celltype, "_emVAR_glm_paired_", fileDate(),".out"), row.names=F, col.names=T, sep="\t", quote=F)
+        }
       }
-      outB <- DESkew(cond_pass, counts_norm_DE, attributesData, celltype, dups_output,prior, cutoff, paired)
-      if(paired==F){
-        write.table(outB,paste0("results/", file_prefix, "_", celltype, "_emVAR_glm_", fileDate(),".out"), row.names=F, col.names=T, sep="\t", quote=F)
-      }
-      if(paired==T){
-        write.table(outB,paste0("results/", file_prefix, "_", celltype, "_emVAR_glm_paired_", fileDate(),".out"), row.names=F, col.names=T, sep="\t", quote=F)
-      }
+
     }
 
     message("Writing bed File")
@@ -560,6 +577,12 @@ cellSpecificTtest<-function(attributesData, counts_norm, dups_output, ctrl_mean,
   snp_data_ctdata_pairs <- snp_data_ctdata_pairs[order(snp_data_ctdata_pairs$SNP, snp_data_ctdata_pairs$window, snp_data_ctdata_pairs$strand, snp_data_ctdata_pairs$haplotype, snp_data_ctdata_pairs$allele),]
   snp_data_expdata_pairs <- merge(snp_data_pairs,dups_output, by.x="ID", by.y="row.names", all.x=T, no.dups=F)
   snp_data_expdata_pairs <- snp_data_expdata_pairs[order(snp_data_expdata_pairs$SNP, snp_data_expdata_pairs$window, snp_data_expdata_pairs$strand, snp_data_expdata_pairs$haplotype, snp_data_expdata_pairs$allele),]
+
+  # Check for at least two rows; skip if not enough pairs
+  if (nrow(snp_data_pairs) < 2) {
+    message("Skipping t-test: not enough SNP pairs for this cell type.")
+    return(data.frame())
+  }
 
   if(altRef==T){
     evens <- seq(2, nrow(snp_data_pairs), by = 2)
@@ -965,6 +988,7 @@ plot_logFC <- function(full_output, sample, negCtrlName="negCtrl", posCtrlName="
 
 ### Function which runs EVERYTHING
 # countsData      : table of tag counts, columns should include: Barcode, Oligo, Sample names
+# runAllelic     : Logical, default TRUE. Whether to run allelic skew tests (tTest and DEase).
 # attributesData  : table of full attributes, columns should include: ID, SNP, Project, Window, Strand, Allele,
   # Haplotype, Bash
 # conditionData   : table of conditions, 2 columns no header align to the variable column headers of countsData
@@ -975,7 +999,9 @@ plot_logFC <- function(full_output, sample, negCtrlName="negCtrl", posCtrlName="
 # altRef          : Logical, default T indicating sorting by alt/ref, if sorting ref/alt set to F
 # method          : Method to be used to normalize the data. 4 options - summit shift normalization 'ss', remove the outliers before DESeq normalization 'ro'
   # perform normalization for negative controls only 'nc', median of ratios method used by DESeq 'mn'
-MPRAmodel <- function(countsData, attributesData, conditionData, filePrefix, negCtrlName="negCtrl", posCtrlName="expCtrl", projectName="MPRA_PROJ", exclList=c(), plotSave=T, altRef=T, method = 'ss', tTest=T, DEase=T, cSkew=T, correction="BH", cutoff=0.01, upDisp=T, prior=F, raw=T, paired=F, color_table, ...){
+MPRAmodel <- function(countsData, attributesData, conditionData, filePrefix, negCtrlName="negCtrl", posCtrlName="expCtrl", 
+                      projectName="MPRA_PROJ", exclList=c(), plotSave=T, altRef=T, method = 'ss', tTest=T, DEase=T, 
+                      cSkew=T, correction="BH", cutoff=0.01, upDisp=T, prior=F, raw=T, paired=F, color_table, runAllelic=TRUE, ...) {
   file_prefix <- filePrefix
   # Make sure that the plots and results directories are present in the current directory
   mainDir <- getwd()
@@ -984,7 +1010,7 @@ MPRAmodel <- function(countsData, attributesData, conditionData, filePrefix, neg
   # Resolve any multi-project conflicts, run normalization, and write celltype specific results files
   attributesData <- addHaplo(attributesData, negCtrlName, posCtrlName, projectName)
   message("running DESeq")
-  analysis_out <- dataOut(countsData, attributesData, conditionData, altRef=altRef, exclList, file_prefix, method, negCtrlName, tTest, DEase, cSkew, correction, cutoff, upDisp, prior, paired)
+  analysis_out <- dataOut(countsData, attributesData, conditionData, altRef=altRef, exclList, file_prefix, method, negCtrlName, tTest, DEase, cSkew, correction, cutoff, upDisp, prior, paired, runAllelic = runAllelic)
   cond_data <- conditionStandard(conditionData)
   n <- length(levels(cond_data$condition))
   full_output <- analysis_out[1:(n-1)]

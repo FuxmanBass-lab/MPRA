@@ -58,9 +58,10 @@ count_proj <- read.delim("${COUNT_DIR}/${ID_OUT}.count", stringsAsFactors=FALSE)
 cond_proj <- read.delim("${COUNT_DIR}/${ID_OUT}_condition.txt", stringsAsFactors=FALSE, row.names=1, header=FALSE)
 colnames(cond_proj) <- "condition"
 source("${SRC}/03_MPRA_model/model.r")
-proj_out <- MPRAmodel(count_proj, attr_proj, cond_proj, filePrefix=paste0(proj,prefix, sep=""), negCtrlName=negCtrl, posCtrlName=posCtrl, projectName=proj, cSkew=FALSE, prior=FALSE, method='ss')
+proj_out <- MPRAmodel(count_proj, attr_proj, cond_proj, filePrefix=paste0(proj,prefix, sep=""), negCtrlName=negCtrl, posCtrlName=posCtrl, projectName=proj, cSkew=FALSE, prior=FALSE, method='ss', runAllelic=FALSE)
 writeLines(capture.output(sessionInfo()), "sessionInfo.txt")
 EOF
 
+cd "$MODEL_OUT"
 Rscript "$MODEL_OUT/custom.r"
 echo "R model run complete!"
