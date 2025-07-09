@@ -17,10 +17,11 @@ Outputs a tab-separated .proj_list file with:
 """
 
 import sys
+import gzip
 
 def main():
     if len(sys.argv) != 3:
-        print("Usage: python3 make_project_list.py <oligo_seqs.fasta> <project_name>", file=sys.stderr)
+        print("Usage: python3 make_project_list.py <oligo_seqs.fasta(.gz)> <project_name>", file=sys.stderr)
         sys.exit(1)
 
     oligo_seqs = sys.argv[1]
@@ -28,7 +29,16 @@ def main():
     output_file = f"{project_name}.proj_list"
 
     try:
-        with open(oligo_seqs, 'r') as fasta, open(output_file, 'w') as out:
+        if oligo_seqs.endswith('.gz'):
+            fasta = gzip.open(oligo_seqs, 'rt')
+        else:
+            fasta = open(oligo_seqs, 'r')
+    except Exception as e:
+        print(f"ERROR: cannot open file ({oligo_seqs}): {e}", file=sys.stderr)
+        sys.exit(1)
+
+    try:
+        with fasta, open(output_file, 'w') as out:
             for line in fasta:
                 if line.startswith('>'):
                     header = line.strip().split()
@@ -44,7 +54,7 @@ def main():
 
                     out.write(f"{id_str}\t{project_name}\n")
     except Exception as e:
-        print(f"ERROR: {e}", file=sys.stderr)
+        print(f"ERROR during writing: {e}", file=sys.stderr)
         sys.exit(1)
 
 if __name__ == "__main__":

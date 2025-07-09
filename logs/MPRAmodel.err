@@ -83,17 +83,11 @@ mean-dispersion relationship
 final dispersion estimates
 fitting model and testing
 A549
-summit shift
 GM12878
-summit shift
 HEK293
-summit shift
 Jurkat
-summit shift
 K562
-summit shift
 MRC5
-summit shift
 Tags Normalized
 condition data standardized
 gene-wise dispersion estimates
@@ -138,7 +132,6 @@ Removing count duplicates
 identifying duplicates
 resolving duplicates
 Plotting Normalization Curves
-Skipping density plot for A549 due to insufficient data points.
 Results of dds_results recieved
 Control and Experiment Columns Set
 identifying duplicates
@@ -153,7 +146,6 @@ Removing count duplicates
 identifying duplicates
 resolving duplicates
 Plotting Normalization Curves
-Skipping density plot for GM12878 due to insufficient data points.
 Results of dds_results recieved
 Control and Experiment Columns Set
 identifying duplicates
@@ -168,7 +160,6 @@ Removing count duplicates
 identifying duplicates
 resolving duplicates
 Plotting Normalization Curves
-Skipping density plot for HEK293 due to insufficient data points.
 Results of dds_results recieved
 Control and Experiment Columns Set
 identifying duplicates
@@ -183,7 +174,6 @@ Removing count duplicates
 identifying duplicates
 resolving duplicates
 Plotting Normalization Curves
-Skipping density plot for Jurkat due to insufficient data points.
 Results of dds_results recieved
 Control and Experiment Columns Set
 identifying duplicates
@@ -198,7 +188,6 @@ Removing count duplicates
 identifying duplicates
 resolving duplicates
 Plotting Normalization Curves
-Skipping density plot for K562 due to insufficient data points.
 Results of dds_results recieved
 Control and Experiment Columns Set
 identifying duplicates
@@ -213,7 +202,6 @@ Removing count duplicates
 identifying duplicates
 resolving duplicates
 Plotting Normalization Curves
-Skipping density plot for MRC5 due to insufficient data points.
 Results of dds_results recieved
 Control and Experiment Columns Set
 identifying duplicates
