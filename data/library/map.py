@@ -30,10 +30,6 @@ try:
         for record in SeqIO.parse(ref_in, 'fasta'):
             proj = id_to_proj.get(record.id)
 
-            # If not found in map, default to exp
-            if proj is None:
-                proj = 'exp'
-
             if proj in pos_projects:
                 SeqIO.write(record, pos_out, 'fasta')
             elif proj in neg_projects:
