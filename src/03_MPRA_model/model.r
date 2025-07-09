@@ -184,6 +184,8 @@ tagNorm <- function(countsData, conditionData, attributesData, exclList = c(), m
   dds <- process[[1]]
   dds_results_orig <- dds_results
   attribute_ids <- (attributesData[attributesData$ctrl_exp==negCtrlName,])$ID
+  # ensure only valid oligo IDs for DESeq subsetting
+  attribute_ids <- attribute_ids[!is.na(attribute_ids) & attribute_ids %in% rownames(dds)]
   full_attribute_ids <- attributesData$ID
   #count_data <- oligoIsolate(countsData)
   count_data <- countsData
@@ -214,6 +216,8 @@ tagNorm <- function(countsData, conditionData, attributesData, exclList = c(), m
       temp_outputA_neg <- temp_outputA[full_attribute_ids,]
       attribute_ids <- row.names(temp_outputA_neg[!is.na(temp_outputA_neg$pvalue) & temp_outputA_neg$pvalue>0.001,])
     }
+    # re-filter after outlier removal
+    attribute_ids <- attribute_ids[attribute_ids %in% rownames(dds)]
   }
   # Remove outliers or negative controls only
   if(method == "ro" | method == "nc"){
