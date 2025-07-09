@@ -131,7 +131,7 @@ conditionStandard <- function(conditionData){
   # and celltype
 # exclList        : list of celltypes that should be excluded from the analysis. Empty by default
 ## OUTPUT: dds_results (initial)
-processAnalysis <- function(countsData, conditionData, exclList=c()){
+processAnalysis <- function(countsData, conditionData, exclList=c(), anchorDNA=TRUE){
   # bring in count data and condition data from previously defined functions
   count_data <- countsData #oligoIsolate(countsData)
   cond_data <- conditionStandard(conditionData)
@@ -142,6 +142,23 @@ processAnalysis <- function(countsData, conditionData, exclList=c()){
   # perform DESeq analysis
   dds <- DESeqDataSetFromMatrix(countData = count_data, colData = cond_data, design = ~condition)
   dds$condition <- relevel(dds$condition, "DNA")
+
+  # ---- Anchor DNA: force DNA SF=1, adjust RNA SF to mimic joint normalization ----
+  if (anchorDNA) {
+    # Estimate original DESeq2 size factors (median-of-ratios)
+    dds <- estimateSizeFactors(dds)
+    sf_orig <- sizeFactors(dds)
+    # Identify DNA replicates and compute their median size factor
+    dna_idx <- which(cond_data$condition == "DNA")
+    sf_dna_median <- median(sf_orig[dna_idx])
+    # Create new size-factor vector: DNA = 1, RNA = original_SF / median(DNA_SF)
+    sf_new <- sf_orig
+    sf_new[dna_idx] <- 1
+    sf_new[-dna_idx] <- sf_orig[-dna_idx] / sf_dna_median
+    sizeFactors(dds) <- sf_new
+  }
+  # ----------------------------------------------------------------------------
+  
   dds_results <- DESeq(dds, fitType = 'local', minReplicatesForReplace=Inf)
 
   return(list(dds,dds_results))
@@ -161,8 +178,8 @@ processAnalysis <- function(countsData, conditionData, exclList=c()){
   # 'ro' : Remove outliers - remove oligos that don't have a p-value or have a p-value > 0.001
   # 'nc' : Negative Controls - normalize only the negative controls
 ## OUTPUT: dds_results (normalized), plots normalization curves
-tagNorm <- function(countsData, conditionData, attributesData, exclList = c(), method = 'ss', negCtrlName="negCtrl", upDisp=T, prior=F){
-  process <- processAnalysis(countsData, conditionData, exclList)
+tagNorm <- function(countsData, conditionData, attributesData, exclList = c(), method = 'ss', negCtrlName="negCtrl", upDisp=T, prior=F, anchorDNA=TRUE){
+  process <- processAnalysis(countsData, conditionData, exclList, anchorDNA=anchorDNA)
   dds_results <- process[[2]]
   dds <- process[[1]]
   dds_results_orig <- dds_results
@@ -294,14 +311,14 @@ tagSig <- function(dds_results, dds_rna, cond_data, exclList=c(), prior=F){
 # upDisp          : LOGICAL default T, update dispersions with celltype specific calculations
 # prior           : LOGICAL default T, use betaPrior=T when calculating the celltype specific dispersions.
 ## OUTPUT: writes duplicate output and ttest files for each celltype
-dataOut <- function(countsData, attributesData, conditionData, exclList = c(), altRef = T, file_prefix, method = 'ss', 
+dataOut <- function(countsData, attributesData, conditionData, exclList = c(), altRef = T, file_prefix, method = 'ss', anchorDNA=TRUE, 
                     negCtrlName = "negCtrl", tTest = T, DEase = T, cSkew = T, correction = "BH", cutoff = 0.01, 
                     upDisp = T, prior = F, paired = F, runAllelic = TRUE) {
   counts_data <- countsData[,c("Barcode","Oligo",rownames(conditionData))]
   message(paste0(colnames(counts_data), collapse = "\t"))
   count_data <- oligoIsolate(counts_data, file_prefix)
   message("Oligos isolated")
-  dds_results_all <- tagNorm(count_data, conditionData, attributesData, exclList, method, negCtrlName, upDisp, prior)
+  dds_results_all <- tagNorm(count_data, conditionData, attributesData, exclList, method, anchorDNA=anchorDNA, negCtrlName, upDisp, prior)
   dds_results <- dds_results_all[[1]]
   dds_results_orig <- dds_results_all[[2]]
   attribute_ids <- (attributesData[attributesData$ctrl_exp==negCtrlName,])$ID
@@ -1000,7 +1017,7 @@ plot_logFC <- function(full_output, sample, negCtrlName="negCtrl", posCtrlName="
 # method          : Method to be used to normalize the data. 4 options - summit shift normalization 'ss', remove the outliers before DESeq normalization 'ro'
   # perform normalization for negative controls only 'nc', median of ratios method used by DESeq 'mn'
 MPRAmodel <- function(countsData, attributesData, conditionData, filePrefix, negCtrlName="negCtrl", posCtrlName="expCtrl", 
-                      projectName="MPRA_PROJ", exclList=c(), plotSave=T, altRef=T, method = 'ss', tTest=T, DEase=T, 
+                      projectName="MPRA_PROJ", exclList=c(), plotSave=T, altRef=T, method = 'ss', anchorDNA=TRUE, tTest=T, DEase=T, 
                       cSkew=T, correction="BH", cutoff=0.01, upDisp=T, prior=F, raw=T, paired=F, color_table, runAllelic=TRUE, ...) {
   file_prefix <- filePrefix
   # Make sure that the plots and results directories are present in the current directory
@@ -1010,7 +1027,7 @@ MPRAmodel <- function(countsData, attributesData, conditionData, filePrefix, neg
   # Resolve any multi-project conflicts, run normalization, and write celltype specific results files
   attributesData <- addHaplo(attributesData, negCtrlName, posCtrlName, projectName)
   message("running DESeq")
-  analysis_out <- dataOut(countsData, attributesData, conditionData, altRef=altRef, exclList, file_prefix, method, negCtrlName, tTest, DEase, cSkew, correction, cutoff, upDisp, prior, paired, runAllelic = runAllelic)
+  analysis_out <- dataOut(countsData, attributesData, conditionData, anchorDNA=anchorDNA, altRef=altRef, exclList, file_prefix, method, negCtrlName, tTest, DEase, cSkew, correction, cutoff, upDisp, prior, paired, runAllelic = runAllelic)
   cond_data <- conditionStandard(conditionData)
   n <- length(levels(cond_data$condition))
   full_output <- analysis_out[1:(n-1)]
