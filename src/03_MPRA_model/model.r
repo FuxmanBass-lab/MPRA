@@ -317,7 +317,7 @@ tagSig <- function(dds_results, dds_rna, cond_data, exclList=c(), prior=F){
 ## OUTPUT: writes duplicate output and ttest files for each celltype
 dataOut <- function(countsData, attributesData, conditionData, exclList = c(), altRef = T, file_prefix, method = 'ss', anchorDNA=TRUE, 
                     negCtrlName = "negCtrl", tTest = T, DEase = T, cSkew = T, correction = "BH", cutoff = 0.01, 
-                    upDisp = T, prior = F, paired = F, runAllelic = TRUE) {
+                    upDisp = T, prior = F, paired = F, runAllelic = TRUE, writeBed=TRUE) {
   counts_data <- countsData[,c("Barcode","Oligo",rownames(conditionData))]
   message(paste0(colnames(counts_data), collapse = "\t"))
   count_data <- oligoIsolate(counts_data, file_prefix)
@@ -511,27 +511,30 @@ dataOut <- function(countsData, attributesData, conditionData, exclList = c(), a
 
     }
 
-    message("Writing bed File")
-    full_bed_outputA<-merge(attributesData, as.matrix(dups_output),by.x="ID",by.y="row.names",all.x=TRUE,no.dups=FALSE)
-    # message(paste0(colnames(full_bed_outputA), collapse = "\t"))
-    #printbed<-full_bed_outputA[,c("chr","start","stop","ID","strand","log2FoldChange","Ctrl.Mean","Exp.Mean","pvalue","padj","lfcSE","cigar","md-tag","project")]
-    if(!all(c("start","stop") %in% colnames(full_bed_outputA))){
-      full_bed_outputA$start <- ""
-      full_bed_outputA$stop <- ""
-    }
-    printbed<-full_bed_outputA[,c("chr","start","stop","ID","strand","log2FoldChange","ctrl_mean","exp_mean","pvalue","padj","lfcSE","project")]
-    printbed$score<-"."
-    #printbed<-printbed[,c("chr","start","stop","ID","score","strand","log2FoldChange","Ctrl.Mean","Exp.Mean","pvalue","padj","lfcSE","cigar","md-tag","project")]
-    #colnames(printbed)<-c("chr","start","stop","id","score","strand","log2fc","input-count","output-count","log10pval","log10fdr","lfc-se","cigar","md-tag","project")
-    printbed<-printbed[,c("chr","start","stop","ID","score","strand","log2FoldChange","ctrl_mean","exp_mean","pvalue","padj","lfcSE","project")]
-    colnames(printbed)<-c("chr","start","stop","id","score","strand","log2fc","input-count","output-count","log10pval","log10fdr","lfc-se","project")
-    printbed$strand[printbed$strand=="fwd"]="+"
-    printbed$strand[printbed$strand=="rev"]="-"
-    printbed$log10pval=-log10(printbed$log10pval)
-    printbed$log10fdr=-log10(printbed$log10fdr)
+    if (writeBed) {
+      message("Writing bed File")
+      full_bed_outputA<-merge(attributesData, as.matrix(dups_output),by.x="ID",by.y="row.names",all.x=TRUE,no.dups=FALSE)
+      # message(paste0(colnames(full_bed_outputA), collapse = "\t"))
+      #printbed<-full_bed_outputA[,c("chr","start","stop","ID","strand","log2FoldChange","Ctrl.Mean","Exp.Mean","pvalue","padj","lfcSE","cigar","md-tag","project")]
+      if(!all(c("start","stop") %in% colnames(full_bed_outputA))){
+        full_bed_outputA$start <- ""
+        full_bed_outputA$stop <- ""
+      }
+      printbed<-full_bed_outputA[,c("chr","start","stop","ID","strand","log2FoldChange","ctrl_mean","exp_mean","pvalue","padj","lfcSE","project")]
+      printbed$score<-"."
+      #printbed<-printbed[,c("chr","start","stop","ID","score","strand","log2FoldChange","Ctrl.Mean","Exp.Mean","pvalue","padj","lfcSE","cigar","md-tag","project")]
+      #colnames(printbed)<-c("chr","start","stop","id","score","strand","log2fc","input-count","output-count","log10pval","log10fdr","lfc-se","cigar","md-tag","project")
+      printbed<-printbed[,c("chr","start","stop","ID","score","strand","log2FoldChange","ctrl_mean","exp_mean","pvalue","padj","lfcSE","project")]
+      colnames(printbed)<-c("chr","start","stop","id","score","strand","log2fc","input-count","output-count","log10pval","log10fdr","lfc-se","project")
+      printbed$strand[printbed$strand=="fwd"]="+"
+      printbed$strand[printbed$strand=="rev"]="-"
+      printbed$log10pval=-log10(printbed$log10pval)
+      printbed$log10fdr=-log10(printbed$log10fdr)
 
-    write.table(printbed,paste0("results/",file_prefix,"_",celltype,"_",fileDate(),".bed"),row.names=FALSE,col.names=TRUE,sep="\t",quote=FALSE)
+      write.table(printbed,paste0("results/",file_prefix,"_",celltype,"_",fileDate(),".bed"),row.names=FALSE,col.names=TRUE,sep="\t",quote=FALSE)
+    }
   }
+
   # if(cSkew ==T){
   #   cellSkew(cond_data, counts_norm_DE, attributesData,file_prefix)
   # }
@@ -1022,7 +1025,7 @@ plot_logFC <- function(full_output, sample, negCtrlName="negCtrl", posCtrlName="
   # perform normalization for negative controls only 'nc', median of ratios method used by DESeq 'mn'
 MPRAmodel <- function(countsData, attributesData, conditionData, filePrefix, negCtrlName="negCtrl", posCtrlName="expCtrl", 
                       projectName="MPRA_PROJ", exclList=c(), plotSave=T, altRef=T, method = 'ss', anchorDNA=TRUE, tTest=T, DEase=T, 
-                      cSkew=T, correction="BH", cutoff=0.01, upDisp=T, prior=F, raw=T, paired=F, color_table, runAllelic=TRUE, ...) {
+                      cSkew=T, correction="BH", cutoff=0.01, upDisp=T, prior=F, raw=T, paired=F, color_table, runAllelic=TRUE, writeBed=TRUE, ...) {
   file_prefix <- filePrefix
   # Make sure that the plots and results directories are present in the current directory
   mainDir <- getwd()
@@ -1031,7 +1034,7 @@ MPRAmodel <- function(countsData, attributesData, conditionData, filePrefix, neg
   # Resolve any multi-project conflicts, run normalization, and write celltype specific results files
   attributesData <- addHaplo(attributesData, negCtrlName, posCtrlName, projectName)
   message("running DESeq")
-  analysis_out <- dataOut(countsData, attributesData, conditionData, anchorDNA=anchorDNA, altRef=altRef, exclList, file_prefix, method, negCtrlName, tTest, DEase, cSkew, correction, cutoff, upDisp, prior, paired, runAllelic = runAllelic)
+  analysis_out <- dataOut(countsData, attributesData, conditionData, anchorDNA=anchorDNA, altRef=altRef, exclList, file_prefix, method, negCtrlName, tTest, DEase, cSkew, correction, cutoff, upDisp, prior, paired, runAllelic = runAllelic, writeBed=writeBed)
   cond_data <- conditionStandard(conditionData)
   n <- length(levels(cond_data$condition))
   full_output <- analysis_out[1:(n-1)]
