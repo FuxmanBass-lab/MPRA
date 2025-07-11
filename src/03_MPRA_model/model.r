@@ -357,7 +357,19 @@ dataOut <- function(countsData, attributesData, conditionData, exclList = c(), a
   counts_norm_all <- counts(dds_results, normalized = T)
   
   write.table(counts_norm_all,paste0("results/", file_prefix, "_", fileDate(),"_normalized_counts.out"), quote = F, sep = "\t")
-  
+
+  # Write clean normalized counts TSV with duplicate oligos expanded
+  # First split any parenthesized IDs in the raw matrix
+  counts_norm_sp <- expandDups(counts_norm_all)
+  # Convert to data frame and add ID column from rownames
+  counts_norm_sp_df <- as.data.frame(counts_norm_sp)
+  counts_norm_sp_df$ID <- rownames(counts_norm_sp)
+  # Reorder so ID is first column
+  counts_norm_sp_df <- counts_norm_sp_df[, c("ID", setdiff(colnames(counts_norm_sp_df), "ID"))]
+  # Write the fully resolved TSV
+  write.table(counts_norm_sp_df,
+              file = paste0("results/", file_prefix, "_", fileDate(), "_normalized_counts.tsv"),
+              sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
 
   for (celltype in levels(cond_data$condition)) {
     if(celltype == "DNA" | celltype %in% exclList) next
@@ -369,9 +381,27 @@ dataOut <- function(countsData, attributesData, conditionData, exclList = c(), a
     
     counts_norm <- counts(dds_results, normalized = T)
     counts_norm <- counts_norm[,colnames(counts_norm) %in% rownames(cond_data)[which(condition_table$condition %in% c("DNA",celltype))]]
-    
-    write.table(counts_norm,paste0("results/", file_prefix, "_", fileDate(),"_",celltype, "_normalized_counts.out"), quote = F, sep = "\t")
-    
+    # Write original .out file (raw normalized counts, no ID column)
+    # Write original .out file (raw normalized counts, no ID column)
+    write.table(counts_norm,
+                file = paste0("results/", file_prefix, "_", fileDate(), "_", celltype, "_normalized_counts.out"),
+                quote = FALSE, sep = "\t")
+
+    # Resolve duplicate tile IDs in the raw normalized matrix
+    counts_norm_sp <- expandDups(counts_norm)
+
+    # Convert to data frame and add ID column from rownames
+    counts_norm_sp_df <- as.data.frame(counts_norm_sp)
+    counts_norm_sp_df$ID <- rownames(counts_norm_sp_df)
+
+    # Move ID to the first column
+    counts_norm_sp_df <- counts_norm_sp_df[, c("ID", setdiff(colnames(counts_norm_sp_df), "ID"))]
+
+    # Write the fully resolved TSV
+    write.table(counts_norm_sp_df,
+                file = paste0("results/", file_prefix, "_", fileDate(), "_", celltype, "_normalized_counts.tsv"),
+                sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
+
     if(DEase==T){
       message("Removing count duplicates")
       counts_DE <- counts(dds_results, normalized=F)
