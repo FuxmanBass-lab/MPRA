@@ -430,6 +430,20 @@ dataOut <- function(countsData, attributesData, conditionData, exclList = c(), a
     full_output[[celltype]]<-full_outputA
     write.table(full_outputA, paste0("results/", file_prefix, "_", celltype, "_", fileDate(), ".out"), row.names=F, col.names=T, sep="\t", quote=F)
 
+    # Write simplified activity-only table
+    activity_cols <- c("ID",
+                       "ctrl_mean",
+                       "exp_mean",
+                       "log2FoldChange",
+                       "lfcSE",
+                       "stat",
+                       "pvalue",
+                       "padj")
+    activity_tbl <- full_outputA[, activity_cols, drop=FALSE]
+    write.table(activity_tbl,
+                file=paste0("results/", file_prefix, "_", celltype, "_activity.tsv"),
+                sep="\t", quote=FALSE, row.names=FALSE, col.names=TRUE)
+
     if(runAllelic){
 
       if(tTest==T){

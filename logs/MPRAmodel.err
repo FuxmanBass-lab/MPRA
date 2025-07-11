@@ -251,3 +251,256 @@ data.frame
 65559	20
 65559	20
 There were 50 or more warnings (use warnings() to see the first 50)
+Loading required package: S4Vectors
+Loading required package: stats4
+Loading required package: BiocGenerics
+
+Attaching package: 'BiocGenerics'
+
+The following objects are masked from 'package:stats':
+
+    IQR, mad, sd, var, xtabs
+
+The following objects are masked from 'package:base':
+
+    Filter, Find, Map, Position, Reduce, anyDuplicated, aperm, append,
+    as.data.frame, basename, cbind, colnames, dirname, do.call,
+    duplicated, eval, evalq, get, grep, grepl, intersect, is.unsorted,
+    lapply, mapply, match, mget, order, paste, pmax, pmax.int, pmin,
+    pmin.int, rank, rbind, rownames, sapply, setdiff, sort, table,
+    tapply, union, unique, unsplit, which.max, which.min
+
+
+Attaching package: 'S4Vectors'
+
+The following object is masked from 'package:utils':
+
+    findMatches
+
+The following objects are masked from 'package:base':
+
+    I, expand.grid, unname
+
+Loading required package: IRanges
+Loading required package: GenomicRanges
+Loading required package: GenomeInfoDb
+Loading required package: SummarizedExperiment
+Loading required package: MatrixGenerics
+Loading required package: matrixStats
+
+Attaching package: 'MatrixGenerics'
+
+The following objects are masked from 'package:matrixStats':
+
+    colAlls, colAnyNAs, colAnys, colAvgsPerRowSet, colCollapse,
+    colCounts, colCummaxs, colCummins, colCumprods, colCumsums,
+    colDiffs, colIQRDiffs, colIQRs, colLogSumExps, colMadDiffs,
+    colMads, colMaxs, colMeans2, colMedians, colMins, colOrderStats,
+    colProds, colQuantiles, colRanges, colRanks, colSdDiffs, colSds,
+    colSums2, colTabulates, colVarDiffs, colVars, colWeightedMads,
+    colWeightedMeans, colWeightedMedians, colWeightedSds,
+    colWeightedVars, rowAlls, rowAnyNAs, rowAnys, rowAvgsPerColSet,
+    rowCollapse, rowCounts, rowCummaxs, rowCummins, rowCumprods,
+    rowCumsums, rowDiffs, rowIQRDiffs, rowIQRs, rowLogSumExps,
+    rowMadDiffs, rowMads, rowMaxs, rowMeans2, rowMedians, rowMins,
+    rowOrderStats, rowProds, rowQuantiles, rowRanges, rowRanks,
+    rowSdDiffs, rowSds, rowSums2, rowTabulates, rowVarDiffs, rowVars,
+    rowWeightedMads, rowWeightedMeans, rowWeightedMedians,
+    rowWeightedSds, rowWeightedVars
+
+Loading required package: Biobase
+Welcome to Bioconductor
+
+    Vignettes contain introductory material; view with
+    'browseVignettes()'. To cite Bioconductor, see
+    'citation("Biobase")', and for packages 'citation("pkgname")'.
+
+
+Attaching package: 'Biobase'
+
+The following object is masked from 'package:MatrixGenerics':
+
+    rowMedians
+
+The following objects are masked from 'package:matrixStats':
+
+    anyMissing, rowMedians
+
+running DESeq
+Barcode	Oligo	Plasmid_r1	Plasmid_r2	Plasmid_r3	Plasmid_r4	A549_r1	A549_r2	A549_r3	GM12878_r1	GM12878_r2	GM12878_r3	GM12878_r4	HEK293_r1	HEK293_r2	HEK293_r3	HEK293_r4	Jurkat_r1	Jurkat_r2	Jurkat_r3	Jurkat_r4	Jurkat_r5	K562_r1	K562_r2	K562_r3	K562_r4	MRC5_r1	MRC5_r2	MRC5_r3	MRC5_r4
+Oligos isolated
+using pre-existing size factors
+estimating dispersions
+gene-wise dispersion estimates
+mean-dispersion relationship
+final dispersion estimates
+fitting model and testing
+A549
+GM12878
+HEK293
+Jurkat
+K562
+MRC5
+Tags Normalized
+condition data standardized
+gene-wise dispersion estimates
+mean-dispersion relationship
+final dispersion estimates
+gene-wise dispersion estimates
+mean-dispersion relationship
+final dispersion estimates
+gene-wise dispersion estimates
+mean-dispersion relationship
+final dispersion estimates
+gene-wise dispersion estimates
+mean-dispersion relationship
+final dispersion estimates
+gene-wise dispersion estimates
+mean-dispersion relationship
+final dispersion estimates
+gene-wise dispersion estimates
+mean-dispersion relationship
+final dispersion estimates
+updating dispersions for:
+A549
+found results columns, replacing these
+updating dispersions for:
+GM12878
+found results columns, replacing these
+updating dispersions for:
+HEK293
+found results columns, replacing these
+updating dispersions for:
+Jurkat
+found results columns, replacing these
+updating dispersions for:
+K562
+found results columns, replacing these
+updating dispersions for:
+MRC5
+found results columns, replacing these
+68954	28
+A549
+Removing count duplicates
+identifying duplicates
+resolving duplicates
+Plotting Normalization Curves
+Results of dds_results recieved
+Control and Experiment Columns Set
+identifying duplicates
+resolving duplicates
+Removing Duplicates
+identifying duplicates
+resolving duplicates
+Writing Standard Results File
+GM12878
+Removing count duplicates
+identifying duplicates
+resolving duplicates
+Plotting Normalization Curves
+Results of dds_results recieved
+Control and Experiment Columns Set
+identifying duplicates
+resolving duplicates
+Removing Duplicates
+identifying duplicates
+resolving duplicates
+Writing Standard Results File
+HEK293
+Removing count duplicates
+identifying duplicates
+resolving duplicates
+Plotting Normalization Curves
+Results of dds_results recieved
+Control and Experiment Columns Set
+identifying duplicates
+resolving duplicates
+Removing Duplicates
+identifying duplicates
+resolving duplicates
+Writing Standard Results File
+Jurkat
+Removing count duplicates
+identifying duplicates
+resolving duplicates
+Plotting Normalization Curves
+Results of dds_results recieved
+Control and Experiment Columns Set
+identifying duplicates
+resolving duplicates
+Removing Duplicates
+identifying duplicates
+resolving duplicates
+Writing Standard Results File
+K562
+Removing count duplicates
+identifying duplicates
+resolving duplicates
+Plotting Normalization Curves
+Results of dds_results recieved
+Control and Experiment Columns Set
+identifying duplicates
+resolving duplicates
+Removing Duplicates
+identifying duplicates
+resolving duplicates
+Writing Standard Results File
+MRC5
+Removing count duplicates
+identifying duplicates
+resolving duplicates
+Plotting Normalization Curves
+Results of dds_results recieved
+Control and Experiment Columns Set
+identifying duplicates
+resolving duplicates
+Removing Duplicates
+identifying duplicates
+resolving duplicates
+Writing Standard Results File
+Plotting correlation tables
+Plotting Correlation Scatter Plots
+Plotting log Fold Change plots
+A549
+71225	20
+0	464.75	832.75	968.636611592511	1343.5	5557.75	4406
+data.frame
+65559	20
+65559	20
+65559	20
+GM12878
+71225	20
+0	464.75	832.75	968.636611592511	1343.5	5557.75	4406
+data.frame
+65559	20
+65559	20
+65559	20
+HEK293
+71225	20
+0	464.75	832.75	968.636611592511	1343.5	5557.75	4406
+data.frame
+65559	20
+65559	20
+65559	20
+Jurkat
+71225	20
+0	464.75	832.75	968.636611592511	1343.5	5557.75	4406
+data.frame
+65559	20
+65559	20
+65559	20
+K562
+71225	20
+0	464.75	832.75	968.636611592511	1343.5	5557.75	4406
+data.frame
+65559	20
+65559	20
+65559	20
+MRC5
+71225	20
+0	464.75	832.75	968.636611592511	1343.5	5557.75	4406
+data.frame
+65559	20
+65559	20
+65559	20
+There were 50 or more warnings (use warnings() to see the first 50)
