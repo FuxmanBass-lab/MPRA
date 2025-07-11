@@ -3,7 +3,7 @@ set -euo pipefail
 
 # -----------------------------------------------------------------------------
 # USAGE:
-#   ./pipeline.sh [match|count|model|all]
+#   ./pipeline.sh [match|count|model|compare|all]
 #
 # Example:
 #   ./pipeline.sh all
@@ -70,15 +70,19 @@ case "$STEP" in
     model)
         write_and_submit_job "MPRAmodel" "$SRC_DIR/03_MPRA_model/run_model.sh"
         ;;
+    compare)
+        write_and_submit_job "MPRAcompare" "$SRC_DIR/04_MPRA_compare/run_compare.sh"
+        ;;
     all)
         # Sequential combined job
         cmds="$SRC_DIR/01_MPRA_match/run_match.sh
 $SRC_DIR/02_MPRA_count/run_count.sh
-$SRC_DIR/03_MPRA_model/run_model.sh"
+$SRC_DIR/03_MPRA_model/run_model.sh
+$SRC_DIR/04_MPRA_compare/run_compare.sh"
         write_and_submit_job "MPRAall" "$cmds"
         ;;
     *)
-        echo "Usage: ./pipeline.sh [match|count|model|all]"
+        echo "Usage: ./pipeline.sh [match|count|model|compare|all]"
         exit 1
         ;;
 esac
