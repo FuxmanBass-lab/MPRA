@@ -1,6 +1,10 @@
 /data/library/*.fastq.gz
 /data/samples/*.fastq.gz
+/data/library/*.fasta.gz
 /results/01_match/*
 /results/02_count/*
 /results/03_model/*
+/results/04_compare/*
 /tewhey/
+/logs/*.err
+/logs/*.out
