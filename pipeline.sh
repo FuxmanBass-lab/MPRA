@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# load project-wide settings
+source "$(dirname "${BASH_SOURCE[0]}")/config/settings.sh"
+
 # -----------------------------------------------------------------------------
 # USAGE:
 #   ./pipeline.sh [match|count|model|compare|all]
@@ -11,18 +14,6 @@ set -euo pipefail
 
 STEP="${1:-all}"
 
-# -----------------------------------------------------------------------------
-# EDIT THESE VARIABLES FOR YOUR PROJECT
-# -----------------------------------------------------------------------------
-SCC_PROJ="vcres"                     # <- SET YOUR SCC PROJECT HERE
-BASE_DIR="/projectnb/vcres/myousry/MPRA"
-SRC_DIR="$BASE_DIR/src"
-LOG_DIR="$BASE_DIR/logs"
-CONDA_INIT="/projectnb/vcres/myousry/miniconda3/etc/profile.d/conda.sh"
-ENV_NAME="mpra"
-MEM="64G"
-CORES="16"
-RUNTIME="24:00:00"    # max runtime (48 hours)
 
 mkdir -p "$LOG_DIR"
 

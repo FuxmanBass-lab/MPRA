@@ -368,7 +368,7 @@ dataOut <- function(countsData, attributesData, conditionData, exclList = c(), a
   counts_norm_sp_df <- counts_norm_sp_df[, c("ID", setdiff(colnames(counts_norm_sp_df), "ID"))]
   # Write the fully resolved TSV
   write.table(counts_norm_sp_df,
-              file = paste0("results/", file_prefix, "_", fileDate(), "_normalized_counts.tsv"),
+              file = paste0("results/", file_prefix, "_normalized_counts.tsv"),
               sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
 
   for (celltype in levels(cond_data$condition)) {
@@ -399,7 +399,7 @@ dataOut <- function(countsData, attributesData, conditionData, exclList = c(), a
 
     # Write the fully resolved TSV
     write.table(counts_norm_sp_df,
-                file = paste0("results/", file_prefix, "_", fileDate(), "_", celltype, "_normalized_counts.tsv"),
+                file = paste0("results/", file_prefix, "_", celltype, "_normalized_counts.tsv"),
                 sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
 
     if(DEase==T){

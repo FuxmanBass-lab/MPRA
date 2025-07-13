@@ -5,35 +5,34 @@ set -euo pipefail
 # -----------------------------------------------------------------------------
 # USAGE:
 #   ./run_model.sh
-#
-# -----------------------------------------------------------------------------
-# EDIT THESE PATHS/VARIABLES for your run:
 # -----------------------------------------------------------------------------
 
-BASE_DIR="/projectnb/vcres/myousry/MPRA"
+# load project-wide settings
+source "$(dirname "${BASH_SOURCE[0]}")/../../config/settings.sh"
 
-SRC="$BASE_DIR/src"
-SCRIPTS="$BASE_DIR/scripts"
-REF_FASTA="$BASE_DIR/data/library/OL49_reference.fasta.gz"
-COUNT_DIR="$BASE_DIR/results/02_count"
-MODEL_IN="$BASE_DIR/results/03_model/inputs"
-MODEL_OUT="$BASE_DIR/results/03_model/out"
-ID_OUT="OL49_trial"
-PROJ="OL49"
-PREFIX="trial"
-NEG_CTRL="negCtrl"
-POS_CTRL="posCtrl"
-EXP="exp"
-EXP_FASTA="$BASE_DIR/data/library/exp.fasta.gz"
-NEG_CTRL_FASTA="$BASE_DIR/data/library/negCtrl.fasta.gz"
-POS_CTRL_FASTA="$BASE_DIR/data/library/posCtrl.fasta.gz"
+# derive script-specific paths from settings
+SRC_DIR="$SRC_DIR"
+SCRIPTS_DIR="$SCRIPTS_DIR"
+COUNT_DIR="${RESULTS_COUNT}"
+MODEL_IN="${RESULTS_MODEL}/inputs"
+MODEL_OUT="${RESULTS_MODEL}/out"
+PROJ="$PROJECT_NAME"
+PREFIX="$PROJECT_SUFFIX"
+# controls and experiment come from settings.sh: NEG_CTRL, POS_CTRL, EXP_FASTA, NEG_FASTA, POS_FASTA
+NEG_CTRL="$NEG_CTRL"
+POS_CTRL="$POS_CTRL"
+EXP_FASTA="$EXP_FASTA"
+NEG_CTRL_FASTA="$NEG_FASTA"
+POS_CTRL_FASTA="$POS_FASTA"
+ID_OUT="$ID_OUT"
+
 
 # -----------------------------------------------------------------------------
 # NO NEED TO EDIT BELOW THIS LINE
 # -----------------------------------------------------------------------------
 
 # Sanity check for required files and scripts
-for f in "$SCRIPTS/make_project_list.py" "$SCRIPTS/make_attributes_oligo.py"; do
+for f in "$SCRIPTS_DIR/make_project_list.py" "$SCRIPTS_DIR/make_attributes_oligo.py"; do
   if [ ! -e "$f" ]; then
     echo "ERROR: cannot find required script: $f" >&2
     exit 1
@@ -58,17 +57,17 @@ rm -f "${ID_OUT}.proj_list"
 
 # Process EXP
 echo "Creating project list for EXP..."
-python3 "$SCRIPTS/make_project_list.py" "$EXP_FASTA" "$EXP"
+python3 "$SCRIPTS_DIR/make_project_list.py" "$EXP_FASTA" "$EXP"
 cat "${EXP}.proj_list" >> "${ID_OUT}.proj_list"
 
 # Process NEG_CTRL
 echo "Creating project list for NEG_CTRL..."
-python3 "$SCRIPTS/make_project_list.py" "$NEG_CTRL_FASTA" "$NEG_CTRL"
+python3 "$SCRIPTS_DIR/make_project_list.py" "$NEG_CTRL_FASTA" "$NEG_CTRL"
 cat "${NEG_CTRL}.proj_list" >> "${ID_OUT}.proj_list"
 
 # Process POS_CTRL
 echo "Creating project list for POS_CTRL..."
-python3 "$SCRIPTS/make_project_list.py" "$POS_CTRL_FASTA" "$POS_CTRL"
+python3 "$SCRIPTS_DIR/make_project_list.py" "$POS_CTRL_FASTA" "$POS_CTRL"
 cat "${POS_CTRL}.proj_list" >> "${ID_OUT}.proj_list"
 
 # Optionally clean up individual proj_list files
@@ -76,7 +75,7 @@ rm -f "${EXP}.proj_list" "${NEG_CTRL}.proj_list" "${POS_CTRL}.proj_list"
 
 # Create attributes file from merged proj_list
 echo "Creating attributes file..."
-python3 "$SCRIPTS/make_attributes_oligo.py" "${ID_OUT}.proj_list" "$ID_OUT" 2> make_attributes_warnings.txt
+python3 "$SCRIPTS_DIR/make_attributes_oligo.py" "${ID_OUT}.proj_list" "$ID_OUT" 2> make_attributes_warnings.txt
 
 # Create custom R script
 echo "Generating custom.r..."
@@ -90,7 +89,7 @@ attr_proj <- read.delim("${MODEL_IN}/${ID_OUT}.attributes", stringsAsFactors=FAL
 count_proj <- read.delim("${COUNT_DIR}/${ID_OUT}.count", stringsAsFactors=FALSE)
 cond_proj <- read.delim("${COUNT_DIR}/${ID_OUT}_condition.txt", stringsAsFactors=FALSE, row.names=1, header=FALSE)
 colnames(cond_proj) <- "condition"
-source("${SRC}/03_MPRA_model/model.r")
+source("${SRC_DIR}/03_MPRA_model/model.r")
 proj_out <- MPRAmodel(count_proj, attr_proj, cond_proj, filePrefix=paste0(proj, "_", prefix), negCtrlName=negCtrl, posCtrlName=posCtrl, projectName=proj, prior=FALSE, method='ssn', anchorDNA=TRUE, runAllelic=FALSE, writeBed=FALSE)
 writeLines(capture.output(sessionInfo()), "sessionInfo.txt")
 EOF
