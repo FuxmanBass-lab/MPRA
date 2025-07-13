@@ -5,16 +5,19 @@ set -euo pipefail
 # USAGE:
 #   ./run_count.sh
 #
+# -----------------------------------------------------------------------------
 # EDIT THESE PATHS/VARIABLES for your run:
 # -----------------------------------------------------------------------------
 
-SRC="/projectnb/vcres/myousry/MPRA/src"          # wrapper python code
-SCRIPTS="/projectnb/vcres/myousry/MPRA/scripts"  # helper scripts
-RAW_DIR="/projectnb/vcres/myousry/MPRA/data/samples" # directory containing actual FASTQ files
-ACC_FILE="/projectnb/vcres/myousry/MPRA/config/acc_id.txt"
-PARSED="/projectnb/vcres/myousry/MPRA/results/01_match/OL49_trial.merged.match.enh.mapped.barcode.ct.parsed"
-OUTDIR="/projectnb/vcres/myousry/MPRA/results/02_count"
+BASE_DIR="/projectnb/vcres/myousry/MPRA"
+
 ID_OUT="OL49_trial"
+SRC="$BASE_DIR/src"                        # wrapper python code
+SCRIPTS="$BASE_DIR/scripts"                # helper scripts
+RAW_DIR="$BASE_DIR/data/samples"           # directory containing actual FASTQ files
+ACC_FILE="$BASE_DIR/config/acc_id.txt"
+PARSED="$BASE_DIR/results/01_match/${ID_OUT}.merged.match.enh.mapped.barcode.ct.parsed"
+OUTDIR="$BASE_DIR/results/02_count"
 
 # -----------------------------------------------------------------------------
 # NO NEED TO EDIT BELOW THIS LINE

@@ -5,16 +5,19 @@ set -euo pipefail
 # USAGE:
 #   ./run_match.sh
 #
+# -----------------------------------------------------------------------------
 # EDIT THESE PATHS/VARIABLES for your run:
 # -----------------------------------------------------------------------------
 
 # --- REQUIRED INPUTS (EDIT HERE) ---
-SRC="/projectnb/vcres/myousry/MPRA/src" # wrapper python code for each step
-SCRIPTS="/projectnb/vcres/myousry/MPRA/scripts"  # Directory containing helper scripts
-READ1="/projectnb/vcres/myousry/MPRA/data/library/OL49_r1.fastq.gz"
-READ2="/projectnb/vcres/myousry/MPRA/data/library/OL49_r2.fastq.gz"
-REF="/projectnb/vcres/myousry/MPRA/data/library/OL49_reference.fasta.gz"
-OUTDIR="/projectnb/vcres/myousry/MPRA/results/01_match"
+BASE_DIR="/projectnb/vcres/myousry/MPRA"
+
+SRC="$BASE_DIR/src"                    # wrapper python code for each step
+SCRIPTS="$BASE_DIR/scripts"            # Directory containing helper scripts
+READ1="$BASE_DIR/data/library/OL49_r1.fastq.gz"
+READ2="$BASE_DIR/data/library/OL49_r2.fastq.gz"
+REF="$BASE_DIR/data/library/OL49_reference.fasta.gz"
+OUTDIR="$BASE_DIR/results/01_match"
 ID_OUT="OL49_trial"
 #ATTR="/projectnb/vcres/myousry/MPRA/data/reference/OL49_attributes.tsv"   # (uncomment if needed)
 

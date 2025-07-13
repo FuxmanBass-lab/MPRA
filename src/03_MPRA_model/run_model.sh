@@ -1,28 +1,32 @@
 #!/usr/bin/env bash
+
 set -euo pipefail
 
 # -----------------------------------------------------------------------------
 # USAGE:
 #   ./run_model.sh
 #
+# -----------------------------------------------------------------------------
 # EDIT THESE PATHS/VARIABLES for your run:
 # -----------------------------------------------------------------------------
 
-SRC="/projectnb/vcres/myousry/MPRA/src"                # source code root (python + R)
-SCRIPTS="/projectnb/vcres/myousry/MPRA/scripts"        # helper scripts directory
-REF_FASTA="/projectnb/vcres/myousry/MPRA/data/library/OL49_reference.fasta.gz"
-COUNT_DIR="/projectnb/vcres/myousry/MPRA/results/02_count"
-MODEL_IN="/projectnb/vcres/myousry/MPRA/results/03_model/inputs"
-MODEL_OUT="/projectnb/vcres/myousry/MPRA/results/03_model/out"
+BASE_DIR="/projectnb/vcres/myousry/MPRA"
+
+SRC="$BASE_DIR/src"
+SCRIPTS="$BASE_DIR/scripts"
+REF_FASTA="$BASE_DIR/data/library/OL49_reference.fasta.gz"
+COUNT_DIR="$BASE_DIR/results/02_count"
+MODEL_IN="$BASE_DIR/results/03_model/inputs"
+MODEL_OUT="$BASE_DIR/results/03_model/out"
 ID_OUT="OL49_trial"
 PROJ="OL49"
 PREFIX="trial"
 NEG_CTRL="negCtrl"
 POS_CTRL="posCtrl"
 EXP="exp"
-EXP_FASTA="/projectnb/vcres/myousry/MPRA/data/library/exp.fasta.gz"
-NEG_CTRL_FASTA="/projectnb/vcres/myousry/MPRA/data/library/negCtrl.fasta.gz"
-POS_CTRL_FASTA="/projectnb/vcres/myousry/MPRA/data/library/posCtrl.fasta.gz"
+EXP_FASTA="$BASE_DIR/data/library/exp.fasta.gz"
+NEG_CTRL_FASTA="$BASE_DIR/data/library/negCtrl.fasta.gz"
+POS_CTRL_FASTA="$BASE_DIR/data/library/posCtrl.fasta.gz"
 
 # -----------------------------------------------------------------------------
 # NO NEED TO EDIT BELOW THIS LINE
