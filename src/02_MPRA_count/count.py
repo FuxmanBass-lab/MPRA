@@ -45,17 +45,16 @@ def main():
 
     for fq, sid in zip(fastqs, ids):
         # 1) prep_counts → {sid}.match
-        """
         
         run(
             f"python3 {args.scripts_dir}/make_counts.py "
             f"{fq} {sid} {args.barcode_orientation} {args.bc_len}"
         )
         match_f = f"{sid}.match"
-        """
+
 
         # 2) associate → {sid}.tag
-        """
+
         run(
             f"python3 {args.scripts_dir}/associate_tags.py "
             f"{match_f} {args.parsed} {sid}.tag {args.barcode_orientation}"
@@ -63,15 +62,15 @@ def main():
         tag_files.append(f"{sid}.tag")
         tag_ids.append(sid)
 
-        """
+
         
     # ── make_infile ──────────────────────────────────────────────────────────
-    """
+
     run(
         f"python3 {args.scripts_dir}/make_infile.py "
         f"{','.join(tag_ids)} {','.join(tag_files)} {args.id_out}"
     )
-    """
+
     
     samples_txt = f"{args.id_out}_samples.txt"
 
@@ -93,7 +92,7 @@ def main():
     count_f = f"{args.id_out}.count"
     stats_f = f"{args.id_out}.stats"
 
-    """
+
     # compile barcodes + cs into count file
     flag_list = args.flags.strip().split()
     compile_cmd = (
@@ -118,7 +117,7 @@ def main():
         + count_f + ".log > " + stats_f
     )
     run(awk_cmd)
-    """
+
 
 
     # 4) read_stats.py (replaces Rscript read_stats.R)
