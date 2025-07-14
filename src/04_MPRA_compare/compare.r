@@ -96,8 +96,20 @@ for(i in seq_len(nrow(comp))) {
     stringsAsFactors=FALSE,
     check.names    = FALSE
   )
+  # Add per-replicate activity columns: log2(rep / dna_mean)
+  for (s in grp1) {
+    out[[paste0(s, "_activity")]] <- log2(grp1_counts[, s] / dna_mean)
+  }
+  for (s in grp2) {
+    out[[paste0(s, "_activity")]] <- log2(grp2_counts[, s] / dna_mean)
+  }
   write.table(out,
               file=file.path(out_dir, paste0("comparison_", comp_name, ".tsv")),
               sep="\t", quote=FALSE, row.names=FALSE)
   message("Wrote ", file.path(out_dir, paste0("comparison_", comp_name, ".tsv")))
+  # Write extended results with per-replicate activity
+  write.table(out,
+              file = file.path(out_dir, paste0("comparison_", comp_name, "_with_replicate_activity.tsv")),
+              sep = "\t", quote = FALSE, row.names = FALSE)
+  message("Wrote ", file.path(out_dir, paste0("comparison_", comp_name, "_with_replicate_activity.tsv")))
 }
