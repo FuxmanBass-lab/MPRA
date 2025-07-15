@@ -84,8 +84,9 @@ for(i in seq_len(nrow(comp))) {
   dna_mean  <- rowMeans(plasmid_counts, na.rm=TRUE)
   grp1_mean <- rowMeans(grp1_counts,   na.rm=TRUE)
   grp2_mean <- rowMeans(grp2_counts,   na.rm=TRUE)
-  # Build output table including counts and means
-  out <- data.frame(
+
+  # Build core output table (no per-replicate activity)
+  core_out <- data.frame(
     ID             = feats,
     dna_mean       = dna_mean,
     grp1_mean      = grp1_mean,
@@ -93,22 +94,24 @@ for(i in seq_len(nrow(comp))) {
     log2FoldChange = res$log2FoldChange,
     pvalue         = res$pvalue,
     padj           = res$padj,
-    stringsAsFactors=FALSE,
+    stringsAsFactors = FALSE,
     check.names    = FALSE
   )
-  # Add per-replicate activity columns: log2(rep / dna_mean)
+  # Write core results
+  write.table(core_out,
+              file = file.path(out_dir, paste0("comparison_", comp_name, ".tsv")),
+              sep = "\t", quote = FALSE, row.names = FALSE)
+  message("Wrote ", file.path(out_dir, paste0("comparison_", comp_name, ".tsv")))
+
+  # Now add per-replicate activity columns and write extended file
+  ext_out <- core_out
   for (s in grp1) {
-    out[[paste0(s, "_activity")]] <- log2(grp1_counts[, s] / dna_mean)
+    ext_out[[paste0(s, "_activity")]] <- log2(grp1_counts[, s] / dna_mean)
   }
   for (s in grp2) {
-    out[[paste0(s, "_activity")]] <- log2(grp2_counts[, s] / dna_mean)
+    ext_out[[paste0(s, "_activity")]] <- log2(grp2_counts[, s] / dna_mean)
   }
-  write.table(out,
-              file=file.path(out_dir, paste0("comparison_", comp_name, ".tsv")),
-              sep="\t", quote=FALSE, row.names=FALSE)
-  message("Wrote ", file.path(out_dir, paste0("comparison_", comp_name, ".tsv")))
-  # Write extended results with per-replicate activity
-  write.table(out,
+  write.table(ext_out,
               file = file.path(out_dir, paste0("comparison_", comp_name, "_with_replicate_activity.tsv")),
               sep = "\t", quote = FALSE, row.names = FALSE)
   message("Wrote ", file.path(out_dir, paste0("comparison_", comp_name, "_with_replicate_activity.tsv")))
