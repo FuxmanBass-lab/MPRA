@@ -1,5 +1,21 @@
 #!/usr/bin/env bash
 
+
+# auto-detect base directory of the repo
+BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# prompt user for required settings
+read -p "PROJECT_NAME (e.g. OL49): " PROJECT_NAME
+read -p "PROJECT_SUFFIX (e.g. trial): " PROJECT_SUFFIX
+read -p "CONDA_INIT (full path to conda init script): " CONDA_INIT
+read -p "SCC_PROJ (your SCC project name for qsub): " SCC_PROJ
+
+# write user-provided values into config/settings.sh
+sed -i "s|^export PROJECT_NAME=.*|export PROJECT_NAME=\"$PROJECT_NAME\"|" config/settings.sh
+sed -i "s|^export PROJECT_SUFFIX=.*|export PROJECT_SUFFIX=\"$PROJECT_SUFFIX\"|" config/settings.sh
+sed -i "s|^export CONDA_INIT=.*|export CONDA_INIT=\"$CONDA_INIT\"|" config/settings.sh
+sed -i "s|^export SCC_PROJ=.*|export SCC_PROJ=\"$SCC_PROJ\"|" config/settings.sh
+
 # load settings
 source config/settings.sh
 
