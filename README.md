@@ -139,3 +139,103 @@ Ensure you have placed:
 
 	Proceed to Usage to start the pipeline steps.
 
+
+
+## Usage: Pipeline Wrapper
+
+Once your config/settings.sh is configured, you can launch one or all steps via the high-level wrapper. This will submit each step as a job to the cluster (qsub):
+
+```bash
+# Run only the matching step:
+./pipeline.sh match
+
+# Run only the counting step:
+./pipeline.sh count
+
+# Run only the modeling step:
+./pipeline.sh model
+
+# Run only the comparison step:
+./pipeline.sh compare
+
+# Run all steps in sequence:
+./pipeline.sh all
+
+```
+
+This submits one or more jobs to your SCC cluster with names MPRAmatch, MPRAcount, MPRAmodel, MPRAcompare, or MPRAall.
+Each job sources your Conda environment and invokes the corresponding run_*.sh script under src/. You can monitor each job’s progress by inspecting the log files in the top-level logs/ directory.
+
+
+## Usage: Step-by-Step Commands
+
+If you prefer to run each stage manually (or debug a single step), here are the direct commands and their required inputs:
+
+### 1.	Matching Oligos to Barcodes
+
+```bash
+cd src/01_MPRA_match
+./run_match.sh
+```
+**Inputs:**
+* READ1, READ2 FASTQ files
+* Reference oligo fasta
+  
+**Output:**
+* Merged .match files, barcode–oligo pairs
+* QC plots
+
+### 2.	Counting Barcodes
+
+```bash
+cd ../02_MPRA_count
+./run_count.sh
+```
+
+**Inputs:**
+
+* acc_id.txt (sample ↔ replicate ↔ cell-type ↔ RNA map)
+* Parsed .parsed file from match step
+* Raw FASTQ replicates
+
+**Output:**
+
+* Per-replicate .count tables
+* condition table
+
+
+### 3.	Modeling Activity
+```
+cd ../03_MPRA_model
+./run_model.sh
+```
+**Inputs:**
+
+* Barcode count table (.count)
+* Attributes and condition files
+* Negative/positive control and experimental tiles/oligos FASTAs
+
+**Output:**
+* Global and Per cell-type Normalized counts (*_normalized_counts.tsv)
+* Per cell-type activity (*_activity.tsv)
+* DESeq2 results, bed files, session info
+* QC and visualizations
+
+### 4.	Condition Comparisons
+
+```bash
+cd ../04_MPRA_compare
+./run_compare.sh
+```
+
+**Inputs:**
+
+* Comparison design (config/comparisons.tsv)
+* Normalized counts TSV
+
+**Output:**
+
+* comparison_<name>.tsv (log₂FC, p-values)
+* comparison_<name>_with_replicate_activity.tsv
+
+
