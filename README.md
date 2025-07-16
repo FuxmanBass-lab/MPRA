@@ -123,7 +123,7 @@ What setup.sh does:
 
 **5.	Review and customize**
 
-	Open config/settings.sh in your editor and ensure the four variables above are correctly set for your system. Do not modify other lines unless necessary.
+Open config/settings.sh in your editor and ensure the four variables above are correctly set for your system. Do not modify other lines unless necessary.
 
 
 **7.	Verify the layout**
@@ -137,7 +137,7 @@ Ensure you have placed:
 
 **9.	You are ready to run**
 
-	Proceed to Usage to start the pipeline steps.
+Proceed to Usage to start the pipeline steps.
 
 
 
@@ -194,7 +194,7 @@ cd ../02_MPRA_count
 
 **Inputs:**
 
-* acc_id.txt (sample ↔ replicate ↔ cell-type ↔ RNA map)
+* acc_id.txt (sample ↔ replicate ↔ cell-type ↔ RNA/DNA map)
 * Parsed .parsed file from match step
 * Raw FASTQ replicates
 
