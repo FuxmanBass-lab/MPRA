@@ -6,8 +6,8 @@ A modular, reproducible pipeline for Massively Parallel Reporter Assays (MPRA), 
 2.	Prerequisites
 3.	Repository Layout
 4.	Download and Setup
-5.	Pipeline Wrapper (pipeline.sh)
-6.	Step-by-Step Commands
+5.	Usage: Pipeline Wrapper (pipeline.sh)
+6.	Usage: Step-by-Step Commands
   	1. Matching Oligos to Barcodes (run_match.sh)
   	2. Counting Barcodes (run_count.sh)
   	3. Modeling Activity (run_model.sh)
@@ -29,9 +29,9 @@ This MPRA pipeline processes paired‐end or single‐end FASTQ reads from repor
 All steps are implemented as modular scripts, orchestrated by a job‐submission wrapper for HPC clusters (SGE).
 
 ## Prerequisites
-	•	Linux or macOS
-	•	Conda (Miniconda or Anaconda)
-	•	SGE or compatible job scheduler (optional; pipeline can run locally if desired).
+•	Linux or macOS
+•	Conda (Miniconda or Anaconda)
+•	SGE or compatible job scheduler (optional; pipeline can run locally if desired).
 
 ## Repository Layout
 
@@ -52,7 +52,7 @@ MPRA/
 │   ├── 01_match/                            # reconstructed oligo-barcode mapping
 │   ├── 02_count/                            # per-replicate count tables & QC
 │   ├── 03_model/                            # DESeq2 results, normalized counts, plots
-│   └──04_compare/                          # pairwise comparison TSVs & summaries
+│   └── 04_compare/                          # pairwise comparison TSVs & summaries
 │
 ├── scripts/                                 # utility Python scripts (don’t edit)
 │   ├── associate_tags.py
@@ -92,3 +92,47 @@ MPRA/
 └── setup.sh                                 # checks conda, prompts for your 4 settings,
                                               creates env, makes sure scripts are executable
 ```
+
+
+## Download and Setup
+
+1.	Clone the repository
+
+```bash
+git clone https://github.com/FuxmanBass-lab/MPRA.git
+cd MPRA
+```
+
+3.	Install Conda environment
+Make sure you have Conda (Miniconda or Anaconda) installed and on your $PATH.
+```bash
+./setup.sh
+```
+What setup.sh does:
+* Prompts you to confirm (or supply) the following in config/settings.sh:
+	* 	PROJECT_NAME: your MPRA project identifier (e.g. OL49)
+	* 	ROJECT_SUFFIX: run‐specific tag (e.g. date or batch)
+	* 	CONDA_INIT: path to your conda.sh (e.g. ~/miniconda3/etc/profile.d/conda.sh)
+	* 	CC_PROJ: your SCC/cluster project name for qsub (e.g. vcres)
+* Auto‐detects and sets $BASE_DIR for you.
+* Verifies conda is available.
+* Creates the Conda environment from env.yml if it doesn’t already exist.
+* Checks that all wrapper scripts (run_match.sh, etc.) and pipeline.sh are executable.
+
+
+5.	Review and customize
+
+	Open config/settings.sh in your editor and ensure the four variables above are correctly set for your system. Do not modify other lines unless necessary.
+
+
+7.	Verify the layout
+Ensure you have placed:
+	* **Library FASTA and FASTQ(s)** in data/library/
+	* **Sample FASTQ(s)** in data/samples/
+	* **acc_id.txt** and **comparisons.tsv** in config/
+
+
+9.	You are ready to run
+    
+	Proceed to Usage to start the pipeline steps.
+
