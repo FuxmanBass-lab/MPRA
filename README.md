@@ -96,14 +96,15 @@ MPRA/
 
 ## Download and Setup
 
-1.	Clone the repository
+**1.	Clone the repository**
 
 ```bash
 git clone https://github.com/FuxmanBass-lab/MPRA.git
 cd MPRA
 ```
 
-3.	Install Conda environment
+**3.	Install Conda environment**
+
 Make sure you have Conda (Miniconda or Anaconda) installed and on your $PATH.
 ```bash
 ./setup.sh
@@ -120,19 +121,21 @@ What setup.sh does:
 * Checks that all wrapper scripts (run_match.sh, etc.) and pipeline.sh are executable.
 
 
-5.	Review and customize
+**5.	Review and customize**
 
 	Open config/settings.sh in your editor and ensure the four variables above are correctly set for your system. Do not modify other lines unless necessary.
 
 
-7.	Verify the layout
+**7.	Verify the layout**
+
 Ensure you have placed:
-	* **Library FASTA and FASTQ(s)** in data/library/
-	* **Sample FASTQ(s)** in data/samples/
-	* **acc_id.txt** and **comparisons.tsv** in config/
+
+* **Library FASTA and FASTQ(s)** in data/library/
+* **Sample FASTQ(s)** in data/samples/
+* **acc_id.txt** and **comparisons.tsv** in config/
 
 
-9.	You are ready to run
-    
+**9.	You are ready to run**
+
 	Proceed to Usage to start the pipeline steps.
 
