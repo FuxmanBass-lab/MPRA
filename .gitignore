@@ -5,6 +5,5 @@
 /results/02_count/*
 /results/03_model/*
 /results/04_compare/*
-/tewhey/
 /logs/*.err
 /logs/*.out

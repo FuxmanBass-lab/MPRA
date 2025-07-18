@@ -38,9 +38,9 @@ rownames(counts_mat) <- df$ID
 # 2. Loop over provided comparisons
 for(i in seq_len(nrow(comp))) {
   comp_name <- comp$Comparison[i]
-  # parse sample names by splitting comma-separated strings
-  grp1 <- unlist(strsplit(comp$Group1[i], ","))
-  grp2 <- unlist(strsplit(comp$Group2[i], ","))
+  # split comma-separated sample names and trim whitespace
+  grp1 <- trimws(unlist(strsplit(comp$Group1[i], ",")))
+  grp2 <- trimws(unlist(strsplit(comp$Group2[i], ",")))
   samp  <- c(grp1, grp2)
   # check samples exist
   missing <- setdiff(samp, colnames(counts_mat))
