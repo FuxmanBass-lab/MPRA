@@ -70,6 +70,8 @@ def main():
                         help='Include CIGAR substitutions in score_all')
     parser.add_argument('-B', action='store_true', dest='bit_flag',
                         help='Filter to forward-strand only (bit 0x10 unset)')
+    parser.add_argument('-O', '--oligo_alnmismatchrate_cutoff', type=float, default=0.05,
+                        help='Maximum allowed oligo alignment mismatch rate (default: 0.05)')
     parser.add_argument('sam', help='Input SAM file path')
     parser.add_argument('out', help='Output prefix (will write to this file)')
     args = parser.parse_args()
@@ -77,7 +79,7 @@ def main():
     infile = Path(args.sam)
     outfile = Path(args.out)
 
-    score_cutoff = 0.05
+    score_cutoff = args.oligo_alnmismatchrate_cutoff
     chr_size = {}
 
     with infile.open() as fin, outfile.open('w') as fout:

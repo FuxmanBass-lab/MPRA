@@ -25,6 +25,8 @@ def main():
     p.add_argument("--barcode_link",   default="TCTAGA")
     p.add_argument("--oligo_link",     default="AGTG")
     p.add_argument("--end_oligo_link", default="CGTC")
+    p.add_argument("--oligo_alnmismatchrate_cutoff", type=float, default=0.05,
+                   help="Maximum allowed oligo alignment mismatch rate (default 0.05)")
     p.add_argument("--scripts_dir",    required=True, help="where pull_barcodes.py etc live")
     p.add_argument("--out_dir",        required=True, help="where to write all results")
     p.add_argument("--id_out",         required=True, help="output prefix (id_out)")
@@ -69,7 +71,9 @@ def main():
 
     # 5) SAM2MPRA
     mapped = f"{args.id_out}.merged.match.enh.mapped"
-    run(f"python3 {args.scripts_dir}/sam2mpra_cs.py -C {sam} {mapped}")
+    run(
+        f"python3 {args.scripts_dir}/sam2mpra_cs.py -C {sam} -O {args.oligo_alnmismatchrate_cutoff} {mapped}"
+    )
 
     # 6) Sort
     sorted_f = f"{mapped}.barcode.sort"

@@ -20,6 +20,13 @@ OUTDIR="$RESULTS_MATCH"
 ID_OUT="$ID_OUT"
 # optional attributes file
 ATTR="${ATTRIBUTES_FILE:-}"
+# optional oligo alignment mismatch cutoff
+OLISMATCH="${OLIGO_ALNMISMATCHRATE_CUTOFF:-}"
+if [ -n "${OLISMATCH}" ]; then
+  OLMISMATCH_ARG="--oligo_alnmismatchrate_cutoff ${OLISMATCH}"
+else
+  OLMISMATCH_ARG=""
+fi
 
 # -----------------------------------------------------------------------------
 # NO NEED TO EDIT BELOW THIS LINE
@@ -45,6 +52,7 @@ python3 "$SRC_DIR/01_MPRA_match/match.py" \
   --read_b           "$READ2" \
   --reference_fasta  "$REF" \
   $ATTR_ARG \
+  $OLISMATCH_ARG \
   --scripts_dir      "$SCRIPTS_DIR" \
   --out_dir          "$OUTDIR" \
   --id_out           "$ID_OUT"

@@ -30,6 +30,7 @@ export READ1="${LIBRARY_DIR}/${PROJECT_NAME}_r1.fastq.gz"    # path to your R1 F
 export READ2="${LIBRARY_DIR}/${PROJECT_NAME}_r2.fastq.gz"    # path to your R2 FASTQ file
 export REFERENCE="${LIBRARY_DIR}/${PROJECT_NAME}_reference.fasta.gz"   # path to the MPRA reference FASTA
 export ATTRIBUTES_FILE="${BASE_DIR}/data/library/${PROJECT_NAME}_attributes.tsv"  # path to attributes TSV (if used)
+export OLIGO_ALN_MISMATCH_RATE_CUTOFF="0.05"    # maximum allowed oligo alignment mismatch rate (default 0.05)
 
 # ─── MPRAcount inputs
 export ACC_ID_FILE="${BASE_DIR}/config/acc_id.txt"           # path to accession ID mapping file
