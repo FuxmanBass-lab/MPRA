@@ -18,7 +18,7 @@ export RESULTS_MODEL="${BASE_DIR}/results/03_model"     # output directory for m
 export RESULTS_COMPARE="${BASE_DIR}/results/04_compare" # output directory for compare step results
 
 # ─── Pipeline settings
-export SCC_PROJ="vcres"                                      # your SCC project name for qsub
+export SCC_PROJ="vtrs"                                      # your SCC project name for qsub
 export CONDA_INIT="/projectnb/vcres/myousry/miniconda3/etc/profile.d/conda.sh"  # path to your conda init script
 export ENV_NAME="mpra"                                       # name of the conda environment to activate
 export MEM="64G"                                             # memory per job (e.g., 64G)

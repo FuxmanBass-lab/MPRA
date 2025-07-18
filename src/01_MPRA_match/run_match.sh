@@ -21,11 +21,11 @@ ID_OUT="$ID_OUT"
 # optional attributes file
 ATTR="${ATTRIBUTES_FILE:-}"
 # optional oligo alignment mismatch cutoff
-OLISMATCH="${OLIGO_ALNMISMATCHRATE_CUTOFF:-}"
+OLISMATCH="${OLIGO_ALN_MISMATCH_RATE_CUTOFF:-}"
 if [ -n "${OLISMATCH}" ]; then
-  OLMISMATCH_ARG="--oligo_alnmismatchrate_cutoff ${OLISMATCH}"
+  OLISMATCH_ARG="--oligo_alnmismatchrate_cutoff ${OLISMATCH}"
 else
-  OLMISMATCH_ARG=""
+  OLISMATCH_ARG=""
 fi
 
 # -----------------------------------------------------------------------------
