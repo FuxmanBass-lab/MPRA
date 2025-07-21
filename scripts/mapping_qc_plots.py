@@ -14,6 +14,13 @@ import argparse
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import gzip
+
+def open_text_file(path):
+    if path.endswith(".gz"):
+        return gzip.open(path, "rt")
+    else:
+        return open(path, "r")
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -31,8 +38,8 @@ def main():
     preseq_out = pd.read_csv(args.preseq_out, sep='\t', header=0)
     preseq_in = pd.read_csv(args.preseq_in, sep='\t', header=None)
 
-    # Read fasta IDs
-    with open(args.fasta_file) as f:
+    # Read fasta IDs (support gzipped input)
+    with open_text_file(args.fasta_file) as f:
         lines = f.read().splitlines()
     fasta_ids = [line.lstrip(">") for line in lines[::2]]
     fasta_seqs = lines[1::2]

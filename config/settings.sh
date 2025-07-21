@@ -22,14 +22,14 @@ export SCC_PROJ="vtrs"                                      # your SCC project n
 export CONDA_INIT="/projectnb/vcres/myousry/miniconda3/etc/profile.d/conda.sh"  # path to your conda init script
 export ENV_NAME="mpra"                                       # name of the conda environment to activate
 export MEM="64G"                                             # memory per job (e.g., 64G)
-export CORES=16                                              # number of CPU cores per job
+export CORES=24                                              # number of CPU cores per job
 export RUNTIME="24:00:00"                                    # walltime limit for jobs (HH:MM:SS)
 
 # ─── MPRAmatch inputs
 export READ1="${LIBRARY_DIR}/${PROJECT_NAME}_r1.fastq.gz"    # path to your R1 FASTQ file
 export READ2="${LIBRARY_DIR}/${PROJECT_NAME}_r2.fastq.gz"    # path to your R2 FASTQ file
 export REFERENCE="${LIBRARY_DIR}/${PROJECT_NAME}_reference.fasta.gz"   # path to the MPRA reference FASTA
-export ATTRIBUTES_FILE="${BASE_DIR}/data/library/${PROJECT_NAME}_attributes.tsv"  # path to attributes TSV (if used)
+# export ATTRIBUTES_FILE="${BASE_DIR}/data/library/${PROJECT_NAME}_attributes.tsv"  # path to attributes TSV (if used)
 export OLIGO_ALN_MISMATCH_RATE_CUTOFF="0.05"    # maximum allowed oligo alignment mismatch rate (default 0.05)
 
 # ─── MPRAcount inputs

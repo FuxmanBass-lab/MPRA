@@ -18,14 +18,21 @@ READ2="$READ2"
 REF="$REFERENCE"
 OUTDIR="$RESULTS_MATCH"
 ID_OUT="$ID_OUT"
-# optional attributes file
-ATTR="${ATTRIBUTES_FILE:-}"
 # optional oligo alignment mismatch cutoff
 OLISMATCH="${OLIGO_ALN_MISMATCH_RATE_CUTOFF:-}"
 if [ -n "${OLISMATCH}" ]; then
   OLISMATCH_ARG="--oligo_alnmismatchrate_cutoff ${OLISMATCH}"
 else
   OLISMATCH_ARG=""
+fi
+
+# Optional attributes file: only use if it exists
+ATTR="${ATTRIBUTES_FILE:-}"
+if [ -n "$ATTR" ] && [ -f "$ATTR" ]; then
+  ATTR_ARG="--attributes $ATTR"
+else
+  ATTR_ARG=""
+  echo "Note: attributes file '$ATTR' not found; skipping --attributes"
 fi
 
 # -----------------------------------------------------------------------------
@@ -40,12 +47,6 @@ for f in "$READ1" "$READ2" "$REF" "$SRC_DIR/01_MPRA_match/match.py"; do
 done
 
 mkdir -p "$OUTDIR"
-
-if [ -n "${ATTR}" ]; then
-  ATTR_ARG="--attributes $ATTR"
-else
-  ATTR_ARG=""
-fi
 
 python3 "$SRC_DIR/01_MPRA_match/match.py" \
   --read_a           "$READ1" \
