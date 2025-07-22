@@ -923,14 +923,33 @@ DESkew <- function(conditionData, counts_norm, attributesData, celltype, dups_ou
 
 
 ### Set up for correlation scatter plot functions.
-panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...){
+panel.cor <- function(x, y, digits = 3, prefix = "", cex.cor, ...) {
   usr <- par("usr"); on.exit(par(usr))
   par(usr = c(0, 1, 0, 1))
-  r <- abs(cor(x, y))
-  txt <- format(c(r, 0.123456789), digits = digits)[1]
-  txt <- paste0(prefix, txt)
-  if(missing(cex.cor)) cex.cor <- 0.8/strwidth(txt)
+  # compute signed Pearson correlation
+  r <- cor(x, y, use = "pairwise.complete.obs")
+  # format with specified digits
+  txt <- sprintf("%s%.*f", prefix, digits, r)
+  # auto-scale text size if not provided
+  if (missing(cex.cor)) cex.cor <- 0.8 / strwidth(txt)
   text(0.5, 0.5, txt, cex = cex.cor * r)
+}
+
+# Panel function to display r^2 (coefficient of determination)
+panel.cor2 <- function(x, y, digits = 3, prefix = "r²=", cex.cor, ...) {
+  usr <- par("usr"); on.exit(par(usr))
+  par(usr = c(0, 1, 0, 1))
+  # compute Pearson correlation and square it
+  r2 <- cor(x, y, use = "pairwise.complete.obs")^2
+  # format with specified digits
+  txt <- format(r2, digits = digits)
+  # use expression for proper superscript rendering
+  label <- bquote(R^2 == .(txt))
+  # auto-scale text size if not provided
+  if (missing(cex.cor)) {
+    cex.cor <- 0.3 / strwidth(as.character(label))
+  }
+  text(0.5, 0.5, labels = label, cex = cex.cor * abs(r2) * 2)
 }
 ###
 panel.lm <- function (x, y,  pch = par("pch"), col.lm = "red",  ...) {
@@ -1088,20 +1107,33 @@ MPRAmodel <- function(countsData, attributesData, conditionData, filePrefix, neg
   message("Plotting correlation tables")
   counts_out <- counts(dds_results, normalized=T)
   if(plotSave==F){
-    cor_mat_log <- pairs(counts_out,upper.panel=panel.cor,lower.panel=panel.lm,log="xy",pch=16)
-    cor_mat1 <- pairs(counts_out,upper.panel=panel.cor,lower.panel=panel.lm,pch=16)
-    cor_mat2 <- pairs(counts_out,upper.panel=panel.cor,lower.panel=panel.lm,xlim=c(0,2000),ylim=c(0,2000),pch=16)
+    cor_mat_log <- pairs(counts_out, upper.panel = panel.cor2, lower.panel = panel.lm, log = "xy", pch = 16)
+    cor_mat1 <- pairs(counts_out, upper.panel = panel.cor, lower.panel = panel.lm, pch = 16)
+    cor_mat2 <- pairs(counts_out, upper.panel = panel.cor, lower.panel = panel.lm, xlim = c(0,2000), ylim = c(0,2000), pch = 16)
   }
 
   if(plotSave==T){
-    png(file=paste0("plots/",file_prefix,"_",fileDate(),"_Cor_mat_log.png"),width=3000,height=3000)
-    pairs(counts_out,upper.panel=panel.cor,lower.panel=panel.lm,log="xy",pch=16)
+    # Logged counts correlation (use r^2)
+    png(file=paste0("plots/",file_prefix,"_",fileDate(),"_Cor_mat_log.png"), width=3000, height=3000)
+    log_counts <- log10(counts_out + 1)
+    pairs(
+      log_counts,
+      upper.panel = function(x, y, ...) panel.cor2(x, y, cex.cor = 1.0, ...),
+      lower.panel = panel.lm,
+      pch         = 16
+    )
     dev.off()
-    png(file=paste0("plots/",file_prefix,"_",fileDate(),"_Cor_mat.png"),width=3000,height=3000)
-    pairs(counts_out,upper.panel=panel.cor,lower.panel=panel.lm,pch=16)
-    dev.off()
-    png(file=paste0("plots/",file_prefix,"_",fileDate(),"_Cor_mat_2.png"),width=3000,height=3000)
-    pairs(counts_out,upper.panel=panel.cor,lower.panel=panel.lm,xlim=c(0,2000),ylim=c(0,2000),pch=16)
+
+    # Zoomed raw counts version
+    png(file=paste0("plots/",file_prefix,"_",fileDate(),"_Cor_mat_raw.png"), width=3000, height=3000)
+    pairs(
+      counts_out,
+      upper.panel = panel.cor,
+      lower.panel = panel.lm,
+      xlim        = c(0, 2000),
+      ylim        = c(0, 2000),
+      pch         = 16
+    )
     dev.off()
   }
 
