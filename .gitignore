@@ -7,3 +7,4 @@
 /results/04_compare/*
 /logs/*.err
 /logs/*.out
+/src/05_MPRA_downstream/
