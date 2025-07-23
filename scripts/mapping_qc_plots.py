@@ -18,7 +18,10 @@ import gzip
 
 def open_text_file(path):
     if path.endswith(".gz"):
-        return gzip.open(path, "rt")
+        try:
+            return gzip.open(path, "rt")
+        except gzip.BadGzipFile:
+            return open(path, "r")
     else:
         return open(path, "r")
 
@@ -38,9 +41,13 @@ def main():
     preseq_out = pd.read_csv(args.preseq_out, sep='\t', header=0)
     preseq_in = pd.read_csv(args.preseq_in, sep='\t', header=None)
 
-    # Read fasta IDs (support gzipped input)
-    with open_text_file(args.fasta_file) as f:
-        lines = f.read().splitlines()
+    # Read fasta IDs (support gzipped input, and fallback if not gzipped)
+    try:
+        with open_text_file(args.fasta_file) as f:
+            lines = f.read().splitlines()
+    except gzip.BadGzipFile:
+        with open(args.fasta_file, "r") as f:
+            lines = f.read().splitlines()
     fasta_ids = [line.lstrip(">") for line in lines[::2]]
     fasta_seqs = lines[1::2]
     fasta_df = pd.DataFrame({'ID': fasta_ids, 'seq': fasta_seqs})
