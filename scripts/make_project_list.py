@@ -45,7 +45,9 @@ def main():
                     array = header[0].split('|')
                     id_str = array[0]
                     id_str = id_str.lstrip('>@')
-                    id_str = id_str.rstrip('/1')
+                    # Remove only the exact trailing '/1' (not all '1' or '/' chars)
+                    if id_str.endswith('/1'):
+                        id_str = id_str[:-2]
 
                     # Add missing colons if fewer than 3
                     n_colons = id_str.count(':')
