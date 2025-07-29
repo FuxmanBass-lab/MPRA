@@ -18,12 +18,10 @@ MODEL_IN="${RESULTS_MODEL}/inputs"
 MODEL_OUT="${RESULTS_MODEL}/out"
 PROJ="$PROJECT_NAME"
 PREFIX="$PROJECT_SUFFIX"
-# controls and experiment come from settings.sh: NEG_CTRL, POS_CTRL, EXP_FASTA, NEG_FASTA, POS_FASTA
+LIBRARY="$LIBRARY_DIR"
+# controls and experiment come from settings.sh: NEG_CTRL, POS_CTRL
 NEG_CTRL="$NEG_CTRL"
 POS_CTRL="$POS_CTRL"
-EXP_FASTA="$EXP_FASTA"
-NEG_CTRL_FASTA="$NEG_FASTA"
-POS_CTRL_FASTA="$POS_FASTA"
 ID_OUT="$ID_OUT"
 
 
@@ -39,14 +37,6 @@ for f in "$SCRIPTS_DIR/make_project_list.py" "$SCRIPTS_DIR/make_attributes_oligo
   fi
 done
 
-# Check FASTA files
-for f in "$EXP_FASTA" "$NEG_CTRL_FASTA" "$POS_CTRL_FASTA"; do
-  if [ ! -e "$f" ]; then
-    echo "ERROR: cannot find required FASTA: $f" >&2
-    exit 1
-  fi
-done
-
 mkdir -p "$MODEL_IN"
 mkdir -p "$MODEL_OUT"
 
@@ -55,23 +45,27 @@ cd "$MODEL_IN"
 # Remove existing combined proj_list if exists
 rm -f "${ID_OUT}.proj_list"
 
-# Process EXP
-echo "Creating project list for EXP..."
-python3 "$SCRIPTS_DIR/make_project_list.py" "$EXP_FASTA" "$EXP"
-cat "${EXP}.proj_list" >> "${ID_OUT}.proj_list"
+# Split reference FASTA into per-project FASTAs
+echo "Splitting reference FASTA by project..."
+python3 "$SCRIPTS_DIR/map_oligos_proj.py" \
+  --map "$LIBRARY/tile_proj_map.tsv" \
+  --fasta "$LIBRARY/OL49_reference.fasta.gz" \
+  --outdir "$MODEL_IN"
 
-# Process NEG_CTRL
-echo "Creating project list for NEG_CTRL..."
-python3 "$SCRIPTS_DIR/make_project_list.py" "$NEG_CTRL_FASTA" "$NEG_CTRL"
-cat "${NEG_CTRL}.proj_list" >> "${ID_OUT}.proj_list"
+# Loop over expected project FASTAs to build combined proj_list
+while read fasta_file; do
+  proj=$(basename "$fasta_file" .fasta.gz)
+  echo "Creating project list for $proj..."
+  python3 "$SCRIPTS_DIR/make_project_list.py" "$MODEL_IN/$fasta_file" "$proj"
+  cat "${proj}.proj_list" >> "${ID_OUT}.proj_list"
+done < "$MODEL_IN/expected_fastas.txt"
 
-# Process POS_CTRL
-echo "Creating project list for POS_CTRL..."
-python3 "$SCRIPTS_DIR/make_project_list.py" "$POS_CTRL_FASTA" "$POS_CTRL"
-cat "${POS_CTRL}.proj_list" >> "${ID_OUT}.proj_list"
-
-# Optionally clean up individual proj_list files
-rm -f "${EXP}.proj_list" "${NEG_CTRL}.proj_list" "${POS_CTRL}.proj_list"
+# Clean up individual proj_list files, except the combined list
+for f in *.proj_list; do
+  if [ "$f" != "${ID_OUT}.proj_list" ]; then
+    rm -f "$f"
+  fi
+done
 
 # Create attributes file from merged proj_list
 echo "Creating attributes file..."
