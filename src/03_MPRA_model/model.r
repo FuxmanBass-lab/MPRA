@@ -358,16 +358,22 @@ dataOut <- function(countsData, attributesData, conditionData, exclList = c(), a
   
   write.table(counts_norm_all,paste0("results/", file_prefix, "_", fileDate(),"_normalized_counts.out"), quote = F, sep = "\t")
 
-  # Write clean normalized counts TSV with duplicate oligos expanded
-  # First split any parenthesized IDs in the raw matrix
-  counts_norm_sp <- expandDups(counts_norm_all)
-  # Convert to data frame and add ID column from rownames
-  counts_norm_sp_df <- as.data.frame(counts_norm_sp)
-  counts_norm_sp_df$ID <- rownames(counts_norm_sp)
-  # Reorder so ID is first column
-  counts_norm_sp_df <- counts_norm_sp_df[, c("ID", setdiff(colnames(counts_norm_sp_df), "ID"))]
-  # Write the fully resolved TSV
-  write.table(counts_norm_sp_df,
+  # Write clean normalized counts TSV with duplicate oligos expanded (atomic only)
+  counts_norm_df <- as.data.frame(counts_norm_all, stringsAsFactors = FALSE)
+  counts_norm_df$ID <- rownames(counts_norm_df)
+  counts_norm_df <- counts_norm_df[, c("ID", setdiff(colnames(counts_norm_df), "ID"))]
+  # Expand semicolon-delimited IDs, stripping any parentheses
+  id_lists_global <- strsplit(gsub("^\\(|\\)$", "", counts_norm_df$ID), ";", fixed = TRUE)
+  counts_norm_global_expanded <- do.call(rbind, lapply(seq_along(id_lists_global), function(i) {
+    ids <- trimws(id_lists_global[[i]])
+    row_vals <- counts_norm_df[i, , drop = FALSE]
+    do.call(rbind, lapply(ids, function(id_val) {
+      row_new <- row_vals
+      row_new$ID <- id_val
+      row_new
+    }))
+  }))
+  write.table(counts_norm_global_expanded,
               file = paste0("results/", file_prefix, "_normalized_counts.tsv"),
               sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
 
@@ -382,23 +388,25 @@ dataOut <- function(countsData, attributesData, conditionData, exclList = c(), a
     counts_norm <- counts(dds_results, normalized = T)
     counts_norm <- counts_norm[,colnames(counts_norm) %in% rownames(cond_data)[which(condition_table$condition %in% c("DNA",celltype))]]
     # Write original .out file (raw normalized counts, no ID column)
-    # Write original .out file (raw normalized counts, no ID column)
     write.table(counts_norm,
                 file = paste0("results/", file_prefix, "_", fileDate(), "_", celltype, "_normalized_counts.out"),
                 quote = FALSE, sep = "\t")
 
-    # Resolve duplicate tile IDs in the raw normalized matrix
-    counts_norm_sp <- expandDups(counts_norm)
-
-    # Convert to data frame and add ID column from rownames
-    counts_norm_sp_df <- as.data.frame(counts_norm_sp)
+    # Expand composite IDs into atomic rows for this cell type
+    counts_norm_sp_df <- as.data.frame(counts_norm, stringsAsFactors = FALSE)
     counts_norm_sp_df$ID <- rownames(counts_norm_sp_df)
-
-    # Move ID to the first column
     counts_norm_sp_df <- counts_norm_sp_df[, c("ID", setdiff(colnames(counts_norm_sp_df), "ID"))]
-
-    # Write the fully resolved TSV
-    write.table(counts_norm_sp_df,
+    id_lists_ct <- strsplit(gsub("^\\(|\\)$", "", counts_norm_sp_df$ID), ";", fixed = TRUE)
+    counts_norm_ct_expanded <- do.call(rbind, lapply(seq_along(id_lists_ct), function(i) {
+      ids <- trimws(id_lists_ct[[i]])
+      row_vals <- counts_norm_sp_df[i, , drop = FALSE]
+      do.call(rbind, lapply(ids, function(id_val) {
+        row_new <- row_vals
+        row_new$ID <- id_val
+        row_new
+      }))
+    }))
+    write.table(counts_norm_ct_expanded,
                 file = paste0("results/", file_prefix, "_", celltype, "_normalized_counts.tsv"),
                 sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
 
@@ -460,7 +468,7 @@ dataOut <- function(countsData, attributesData, conditionData, exclList = c(), a
     full_output[[celltype]]<-full_outputA
     write.table(full_outputA, paste0("results/", file_prefix, "_", celltype, "_", fileDate(), ".out"), row.names=F, col.names=T, sep="\t", quote=F)
 
-    # Write simplified activity-only table
+    # Write simplified activity-only table (atomic IDs only)
     activity_cols <- c("ID",
                        "ctrl_mean",
                        "exp_mean",
@@ -470,9 +478,19 @@ dataOut <- function(countsData, attributesData, conditionData, exclList = c(), a
                        "pvalue",
                        "padj")
     activity_tbl <- full_outputA[, activity_cols, drop=FALSE]
-    write.table(activity_tbl,
-                file=paste0("results/", file_prefix, "_", celltype, "_activity.tsv"),
-                sep="\t", quote=FALSE, row.names=FALSE, col.names=TRUE)
+    id_lists_act <- strsplit(gsub("^\\(|\\)$", "", activity_tbl$ID), ";", fixed = TRUE)
+    activity_ct_expanded <- do.call(rbind, lapply(seq_along(id_lists_act), function(i) {
+      ids <- trimws(id_lists_act[[i]])
+      row_vals <- activity_tbl[i, , drop = FALSE]
+      do.call(rbind, lapply(ids, function(id_val) {
+        row_new <- row_vals
+        row_new$ID <- id_val
+        row_new
+      }))
+    }))
+    write.table(activity_ct_expanded,
+                file = paste0("results/", file_prefix, "_", celltype, "_activity.tsv"),
+                sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
 
     if(runAllelic){
 
@@ -590,34 +608,37 @@ dataOut <- function(countsData, attributesData, conditionData, exclList = c(), a
   # normalized-celltype specific DESeq results
 ## Returns: Final output table with no duplicates - Table in the same format as above, except with IDs that were previously several oligos
   ## separated by semi-colons have been separated into separate rows.
-expandDups <- function(output){
-  output_orig <- output
-  if(inherits(output_orig, "matrix")){
-    output_orig <- as.data.frame(output_orig)
+expandDups <- function(output) {
+  # Ensure data.frame input
+  df_orig <- if (inherits(output, "matrix")) as.data.frame(output, stringsAsFactors = FALSE) else as.data.frame(output, stringsAsFactors = FALSE)
+  # Quick return if no composite IDs
+  id_names <- rownames(df_orig)
+  clean_names <- gsub("^\\(|\\)$", "", id_names)
+  if (!any(grepl(";", clean_names))) {
+    return(df_orig)
   }
-  output_new <- cbind(rownames(output_orig), output_orig)
-  colnames(output_new)[1] <- "Row.names"
-  # Identify duplicates, if any exist
-  message("identifying duplicates")
-  dups <- output_new[grep("\\(.*\\)$",output_new$Row.names),]
-  dups$Row.names <- gsub("^\\((.*)\\)$","\\1",dups$Row.names)
-  # Add everything but the duplicates to the final output
-  message("resolving duplicates")
-  output_final <- output_new[-(grep("\\(.*\\)$",output_new$Row.names)),]
-  output_final <- output_final[!(is.na(output_final$Row.names)),]
-  if(nrow(dups) > 0) {
-    for(i in 1:nrow(dups)){
-      dup_id <- unlist(strsplit(dups$Row.names[i],";"))
-      dup_exp <- dups[rep(i, length(dup_id)), ]
-      dup_exp$Row.names <- dup_id
-      output_final <- rbind(dup_exp,output_final)
-    }
-    rownames(output_final) <- output_final[,1]
-    output_final <- output_final[,-1]
-  }else {
-    output_final <- output_orig
+  # Attach rownames as a column
+  df_new <- cbind(Row.names = id_names, df_orig)
+  # Identify composite rows
+  comp_idx <- grepl(";", clean_names)
+  comp_rows <- df_new[comp_idx, , drop = FALSE]
+  # Strip parentheses and split into atomic IDs
+  compounds <- gsub("^\\(|\\)$", "", comp_rows$Row.names)
+  atom_lists <- strsplit(compounds, ";", fixed = TRUE)
+  atom_lists <- lapply(atom_lists, trimws)
+  # Begin with all original rows (including composites)
+  output_combined <- df_new
+  # Append one row per atomic ID for each composite
+  for (i in seq_along(atom_lists)) {
+    atoms <- atom_lists[[i]]
+    rep_block <- comp_rows[rep(i, length(atoms)), , drop = FALSE]
+    rep_block$Row.names <- atoms
+    output_combined <- rbind(output_combined, rep_block)
   }
-  return(output_final)
+  # Restore rownames and drop helper column
+  rownames(output_combined) <- output_combined$Row.names
+  output_combined$Row.names <- NULL
+  return(output_combined)
 }
 
 ### Function to perform TTest on individual cell types
