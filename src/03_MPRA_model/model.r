@@ -72,7 +72,7 @@ addHaplo <- function(attributesData,negCtrlName="negCtrl", posCtrlName="expCtrl"
     }
   }
 
-
+  # Assign control vs. experimental label
   multi_project_check <- colsplit(attributesData$project, ",", names = c("proj1","proj2"))
   if(any(is.na(multi_project_check$proj2))){
     attributesData$ctrl_exp <- attributesData$project
@@ -83,6 +83,7 @@ addHaplo <- function(attributesData,negCtrlName="negCtrl", posCtrlName="expCtrl"
     attributesData[grep(posCtrlName, attributesData$project),]$ctrl_exp <- posCtrlName
 
   }
+
   return(attributesData)
 }
 
@@ -321,7 +322,26 @@ dataOut <- function(countsData, attributesData, conditionData, exclList = c(), a
   counts_data <- countsData[,c("Barcode","Oligo",rownames(conditionData))]
   message(paste0(colnames(counts_data), collapse = "\t"))
   count_data <- oligoIsolate(counts_data, file_prefix)
+  # Ensure all tiles from attributesData are present in count_data
+  count_df <- as.data.frame(count_data, stringsAsFactors = FALSE)
+  count_df$ID <- rownames(count_data)
+  all_ids <- unique(attributesData$ID)
+  full_counts_df <- merge(
+    data.frame(ID = all_ids, stringsAsFactors = FALSE),
+    count_df,
+    by = "ID",
+    all.x = TRUE
+  )
+  # Replace NA counts with zero
+  count_cols <- setdiff(colnames(full_counts_df), "ID")
+  for (col in count_cols) {
+    full_counts_df[[col]][is.na(full_counts_df[[col]])] <- 0
+  }
+  # Restore as matrix with rownames
+  rownames(full_counts_df) <- full_counts_df$ID
+  count_data <- as.matrix(full_counts_df[, count_cols])
   message("Oligos isolated")
+
   dds_results_all <- tagNorm(count_data, conditionData, attributesData, exclList, method, anchorDNA=anchorDNA, negCtrlName, upDisp, prior)
   dds_results <- dds_results_all[[1]]
   dds_results_orig <- dds_results_all[[2]]
@@ -490,6 +510,28 @@ dataOut <- function(countsData, attributesData, conditionData, exclList = c(), a
     }))
     write.table(activity_ct_expanded,
                 file = paste0("results/", file_prefix, "_", celltype, "_activity.tsv"),
+                sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
+
+    # Write expanded activity with full metadata columns
+    meta_cols <- c(
+      "ID","SNP","chr","pos","ref_allele","alt_allele",
+      "allele","window","strand","project","haplotype",
+      "ctrl_exp","DNA_mean","ctrl_mean","exp_mean",
+      "log2FoldChange","lfcSE","stat","pvalue","padj"
+    )
+    full_meta_tbl <- full_outputA[, meta_cols, drop = FALSE]
+    id_lists_meta <- strsplit(gsub("^\\(|\\)$", "", full_meta_tbl$ID), ";", fixed = TRUE)
+    meta_expanded <- do.call(rbind, lapply(seq_along(id_lists_meta), function(i) {
+      ids <- trimws(id_lists_meta[[i]])
+      row_vals <- full_meta_tbl[i, , drop = FALSE]
+      do.call(rbind, lapply(ids, function(id_val) {
+        row_new <- row_vals
+        row_new$ID <- id_val
+        row_new
+      }))
+    }))
+    write.table(meta_expanded,
+                file = paste0("results/", file_prefix, "_", celltype, "_activity_meta.tsv"),
                 sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
 
     if(runAllelic){
