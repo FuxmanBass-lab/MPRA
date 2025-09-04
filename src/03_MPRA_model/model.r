@@ -73,16 +73,9 @@ addHaplo <- function(attributesData,negCtrlName="negCtrl", posCtrlName="expCtrl"
   }
 
   # Assign control vs. experimental label
-  multi_project_check <- colsplit(attributesData$project, ",", names = c("proj1","proj2"))
-  if(any(is.na(multi_project_check$proj2))){
-    attributesData$ctrl_exp <- attributesData$project
-  }
-  else{
-    attributesData$ctrl_exp <- projectName
-    attributesData[grep(negCtrlName, attributesData$project),]$ctrl_exp <- negCtrlName
-    attributesData[grep(posCtrlName, attributesData$project),]$ctrl_exp <- posCtrlName
-
-  }
+  attributesData$ctrl_exp <- attributesData$project
+  attributesData$ctrl_exp[grepl(negCtrlName, attributesData$project)] <- negCtrlName
+  attributesData$ctrl_exp[grepl(posCtrlName, attributesData$project)] <- posCtrlName
 
   return(attributesData)
 }
@@ -323,23 +316,38 @@ dataOut <- function(countsData, attributesData, conditionData, exclList = c(), a
   message(paste0(colnames(counts_data), collapse = "\t"))
   count_data <- oligoIsolate(counts_data, file_prefix)
   # Ensure all tiles from attributesData are present in count_data
+  # Normalize IDs so that any trailing ":NA" in attributes does not break joins.
+  normalize_id <- function(x) sub(":(NA)$", "", x, ignore.case = TRUE)
+
+  # Prepare counts (current DE input), keeping the original Oligo rownames
   count_df <- as.data.frame(count_data, stringsAsFactors = FALSE)
-  count_df$ID <- rownames(count_data)
-  all_ids <- unique(attributesData$ID)
-  full_counts_df <- merge(
-    data.frame(ID = all_ids, stringsAsFactors = FALSE),
-    count_df,
-    by = "ID",
-    all.x = TRUE
-  )
-  # Replace NA counts with zero
-  count_cols <- setdiff(colnames(full_counts_df), "ID")
+  count_df$ID_count <- rownames(count_data)
+  count_df$ID_norm  <- normalize_id(count_df$ID_count)
+
+  # Prepare attributes ID list (may include trailing :NA from haplotype placeholders)
+  all_ids      <- unique(attributesData$ID)
+  attr_df_raw  <- data.frame(ID_attr = all_ids, stringsAsFactors = FALSE)
+  attr_df_raw$ID_norm <- normalize_id(attr_df_raw$ID_attr)
+  attr_df <- unique(attr_df_raw)
+
+  # Merge by normalized ID, so attributes like "...:NA" will match counts "..."
+  full_counts_df <- merge(attr_df, count_df, by = "ID_norm", all.x = TRUE)
+
+  # Determine which columns are counts (the sample columns), and fill NAs with zeros
+  count_cols <- colnames(count_data)
   for (col in count_cols) {
+    if (!col %in% colnames(full_counts_df)) next
     full_counts_df[[col]][is.na(full_counts_df[[col]])] <- 0
   }
-  # Restore as matrix with rownames
+
+  # Use the original counts ID when available; otherwise fall back to the attributes ID
+  full_counts_df$ID <- ifelse(!is.na(full_counts_df$ID_count) & full_counts_df$ID_count != "",
+                              full_counts_df$ID_count,
+                              full_counts_df$ID_attr)
+
+  # Restore as matrix with rownames set to the final, counts-preserving IDs
   rownames(full_counts_df) <- full_counts_df$ID
-  count_data <- as.matrix(full_counts_df[, count_cols])
+  count_data <- as.matrix(full_counts_df[, count_cols, drop = FALSE])
   message("Oligos isolated")
 
   dds_results_all <- tagNorm(count_data, conditionData, attributesData, exclList, method, anchorDNA=anchorDNA, negCtrlName, upDisp, prior)
